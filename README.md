@@ -167,7 +167,9 @@ abriendo los sensores de Pesquera Atlántico Sur (plan Starter), vuelve a recibi
 
 ```
 oceanos/
-├── docs/ECONOMIA-DE-TOKENS.md      Qué cambió respecto de la tabla de los documentos
+├── docs/
+│   ├── ECONOMIA-DE-TOKENS.md   Por qué los premios no son los de los PDF
+│   └── PROPUESTA-DE-VALOR.md   Personas, mapas de empatía y los dos lienzos
 ├── vercel.json                     Build y rewrite de SPA para el plan gratuito
 ├── database/
 │   ├── migrations/001_init.sql     Esquema completo con vistas calculadas
