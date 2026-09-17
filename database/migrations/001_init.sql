@@ -34,6 +34,8 @@ CREATE TYPE credit_status   AS ENUM ('borrador', 'en_validacion', 'certificado',
 CREATE TYPE asset_kind      AS ENUM ('credito_carbono', 'hectarea_viva', 'bono_restauracion');
 CREATE TYPE listing_status  AS ENUM ('borrador', 'publicado', 'pausado', 'agotado');
 CREATE TYPE order_status    AS ENUM ('pendiente', 'pagada', 'liquidada', 'cancelada');
+CREATE TYPE n8n_node_kind   AS ENUM ('webhook', 'condicion', 'whatsapp', 'base_datos', 'email');
+CREATE TYPE n8n_run_status  AS ENUM ('exito', 'fallo', 'omitido');
 
 -- =====================================================================
 -- 1. ZONAS · el ancla de todo el modelo
@@ -75,6 +77,7 @@ CREATE TABLE species (
 -- =====================================================================
 CREATE TABLE users (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  documento      text UNIQUE,            -- MER: identificador del ciudadano (DNI)
   email          citext UNIQUE NOT NULL,
   password_hash  text NOT NULL,
   full_name      text NOT NULL,
@@ -303,6 +306,44 @@ CREATE TABLE orders (
   created_at    timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX orders_listing_idx ON orders (listing_id, created_at DESC);
+
+-- =====================================================================
+-- AUTOMATIZACIÓN · n8n
+-- El MER entregado abstrae la relación Registra (Usuario–Avistamiento)
+-- como una entidad de alto nivel, Evento_Reporte, y la vincula con
+-- Workflow_n8n a través de la relación Dispara. Esa agregación N:M se
+-- reduce acá a una tabla puente: cada fila dice qué reporte, de qué
+-- usuario, disparó qué flujo, y cómo terminó.
+-- =====================================================================
+
+-- MER: Workflow_n8n (id_workflow, nombre_proceso)
+CREATE TABLE n8n_workflows (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug         text UNIQUE NOT NULL,
+  process_name text NOT NULL,
+  node_kind    n8n_node_kind NOT NULL,
+  step_order   smallint NOT NULL,
+  description  text,
+  is_active    boolean NOT NULL DEFAULT true
+);
+
+-- MER: log_disparo_n8n (documento, id_avistamiento, id_workflow).
+-- La llave del MER es compuesta; acá se usa una subrogada porque un
+-- mismo flujo puede correr dos veces sobre el mismo reporte (al cargarlo
+-- y al resolverse la votación). El trío del MER queda como índice único
+-- junto al momento del disparo.
+CREATE TABLE n8n_trigger_log (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  sighting_id  uuid NOT NULL REFERENCES sightings(id) ON DELETE CASCADE,
+  workflow_id  uuid NOT NULL REFERENCES n8n_workflows(id) ON DELETE RESTRICT,
+  run_status   n8n_run_status NOT NULL DEFAULT 'exito',
+  detail       text,
+  triggered_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (user_id, sighting_id, workflow_id, triggered_at)
+);
+CREATE INDEX n8n_log_sighting_idx ON n8n_trigger_log (sighting_id);
+CREATE INDEX n8n_log_when_idx     ON n8n_trigger_log (triggered_at DESC);
 
 -- =====================================================================
 -- VISTAS CALCULADAS

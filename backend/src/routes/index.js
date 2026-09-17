@@ -4,6 +4,7 @@ import sightingsRoutes   from './sightings.routes.js';
 import tokensRoutes      from './tokens.routes.js';
 import orgsRoutes        from './orgs.routes.js';
 import marketplaceRoutes from './marketplace.routes.js';
+import automationsRoutes  from './automations.routes.js';
 
 /**
  * Mapa de la API, ordenado por capa del producto.
@@ -20,4 +21,5 @@ export default async function rutas(app) {
   await app.register(tokensRoutes,      { prefix: '/tokens' });
   await app.register(orgsRoutes,        { prefix: '/organizaciones' });
   await app.register(marketplaceRoutes, { prefix: '/mercado' });
+  await app.register(automationsRoutes,  { prefix: '/automatizaciones' });
 }

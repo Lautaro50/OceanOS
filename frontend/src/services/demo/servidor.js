@@ -302,6 +302,7 @@ post('/avistamientos', ({ body }) => {
     resolved_at: estado === 'verificado' ? creado : null,
   };
   e.avistamientos.push(avistamiento);
+  correrFlujoAlta(avistamiento);
 
   // Los premios en 0 no se anotan: en la base, token_ledger exige
   // amount <> 0, y un movimiento de 0 tampoco le dice nada a nadie.
@@ -366,6 +367,7 @@ post('/avistamientos/:id/voto', ({ params, body }) => {
     const autor = porId(e.usuarios, s.user_id);
     if (resuelto === 'verificado') {
       acreditar(autor.id, PREMIOS.foto_verificada, 'foto_verificada', { sighting_id: s.id });
+      correrFlujoAcreditacion(s);
       autor.reputation = Math.min(autor.reputation + REPUTACION.subeSiVerificado, REPUTACION.maxima);
     } else {
       autor.reputation = Math.max(autor.reputation - REPUTACION.bajaSiRechazado, 0);
@@ -373,6 +375,84 @@ post('/avistamientos/:id/voto', ({ params, body }) => {
   }
 
   return { votos: votos.length, resuelto, tokensGanados: PREMIOS.voto_comunidad };
+});
+
+// ---------------------------------------------------------------------
+// Automatización n8n
+// El flujo entregado con el MER: el alta de un avistamiento dispara un
+// webhook, un nodo de triage decide la rama y cada paso queda registrado.
+// Acá no hay n8n de verdad corriendo; lo que se replica es el registro de
+// disparos, que es lo que el modelo de datos tiene que sostener.
+// ---------------------------------------------------------------------
+const AMENAZADAS = new Set(['VU', 'EN', 'CR']);
+
+function disparar(slug, avistamiento, run_status, detail) {
+  const flujo = e.flujos?.find((f) => f.slug === slug);
+  if (!flujo) return;
+  (e.disparos ??= []).push({
+    id: nuevoId(), user_id: avistamiento.user_id, sighting_id: avistamiento.id,
+    workflow_id: flujo.id, run_status, detail, triggered_at: ahora(),
+  });
+}
+
+/** Los dos primeros nodos y la rama del triage, al dar de alta un reporte. */
+function correrFlujoAlta(avistamiento) {
+  const conf = avistamiento.ai_confidence;
+  const esp = porId(e.especies, avistamiento.species_id);
+  const zona = porId(e.zonas, avistamiento.zone_id);
+
+  disparar('webhook_avistamiento', avistamiento, 'exito', 'Alta recibida');
+  disparar('triage_confianza', avistamiento, 'exito',
+    conf != null ? `Confianza ${Math.round(conf * 100)}%` : 'Sin clasificar');
+
+  if (conf != null && conf > UMBRAL_IA && esp && AMENAZADAS.has(esp.iucn_status)) {
+    disparar('alerta_ong', avistamiento, 'exito',
+      `Aviso enviado por ${zona?.name ?? 'la zona'} · ${esp.common_name} (${esp.iucn_status})`);
+  }
+  if (avistamiento.status === 'verificado') correrFlujoAcreditacion(avistamiento);
+  else disparar('acreditacion_okn', avistamiento, 'omitido', 'A la espera de que la comunidad resuelva la votación');
+}
+
+/** La rama que paga, cuando el reporte ya quedó verificado. */
+function correrFlujoAcreditacion(avistamiento) {
+  disparar('acreditacion_okn', avistamiento, 'exito', 'Saldo actualizado');
+  disparar('aviso_usuario', avistamiento, 'exito', 'Correo enviado al usuario');
+}
+
+get('/automatizaciones', () => {
+  const disparos = [...(e.disparos ?? [])].sort((a, b) => b.triggered_at.localeCompare(a.triggered_at));
+  const flujos = (e.flujos ?? []).map((f) => {
+    const suyos = disparos.filter((d) => d.workflow_id === f.id);
+    return {
+      ...f,
+      corridas: suyos.length,
+      omitidas: suyos.filter((d) => d.run_status === 'omitido').length,
+      ultima: suyos[0]?.triggered_at ?? null,
+    };
+  });
+
+  return {
+    flujos,
+    condicion: { umbral: UMBRAL_IA, estados: [...AMENAZADAS] },
+    registro: disparos.slice(0, 40).map((d) => {
+      const s = porId(e.avistamientos, d.sighting_id);
+      const esp = s && porId(e.especies, s.species_id);
+      const flujo = porId(e.flujos ?? [], d.workflow_id);
+      return {
+        id: d.id,
+        run_status: d.run_status,
+        detail: d.detail,
+        triggered_at: d.triggered_at,
+        proceso: flujo?.process_name ?? '—',
+        nodo: flujo?.node_kind ?? null,
+        reportero: porId(e.usuarios, d.user_id)?.full_name ?? '—',
+        documento: porId(e.usuarios, d.user_id)?.documento ?? null,
+        especie: esp?.common_name ?? null,
+        zona: s ? porId(e.zonas, s.zone_id)?.name ?? null : null,
+        kind: s?.kind ?? null,
+      };
+    }),
+  };
 });
 
 // ---------------------------------------------------------------------

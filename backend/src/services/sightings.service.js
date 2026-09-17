@@ -1,5 +1,6 @@
 import { many, one, transaction } from '../db/index.js';
 import { badRequest, forbidden, notFound } from '../utils/errors.js';
+import { flujoDeAlta, flujoDeAcreditacion } from './automations.service.js';
 
 /**
  * Tabla de premios. Vive en un solo lugar para que la app, el libro mayor
@@ -101,6 +102,10 @@ export async function crear(userId, datos) {
        // columna y dentro de una expresión deja el tipo ambiguo (42P08).
        estado === 'verificado' ? new Date() : null],
     );
+
+    // El alta dispara el flujo de n8n, dentro de la misma transacción:
+    // si el reporte no queda, el registro de disparos tampoco.
+    await flujoDeAlta(cliente, avistamiento, { umbral: UMBRAL_IA });
 
     const movimientos = [['reporte_basico', PREMIOS.reporte_basico]];
     if (estado === 'verificado') movimientos.push(['foto_verificada', PREMIOS.foto_verificada]);
@@ -237,6 +242,7 @@ export async function votar(userId, sightingId, { agrees, speciesId }) {
           'UPDATE users SET reputation = LEAST(reputation + $2, $3) WHERE id = $1',
           [avistamiento.user_id, REPUTACION.subeSiVerificado, REPUTACION.maxima],
         );
+        await flujoDeAcreditacion(cliente, avistamiento);
       } else {
         await cliente.query(
           'UPDATE users SET reputation = GREATEST(reputation - $2, 0) WHERE id = $1',

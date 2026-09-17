@@ -66,6 +66,36 @@ Cómo funciona por dentro:
   `sessionStorage`: sobrevive a recargar la página y se pierde al cerrar la pestaña.
   **Reiniciar datos**, en la barra lateral o en `/funciones`, vuelve a la semilla.
 
+### Publicarlo en Vercel
+
+El sitio de la demo es una SPA estática: la API corre en el navegador, así que no
+necesita base de datos, variables de entorno ni plan pago. Entra entero en el plan
+gratuito.
+
+`vercel.json`, en la raíz, ya deja resuelto qué construir y el rewrite de SPA (sin
+ese rewrite, recargar una dirección como `/app/tokens` devuelve 404 porque no hay
+un archivo con ese nombre).
+
+Desde el sitio de Vercel:
+
+1. Subir el repositorio a GitHub.
+2. En **vercel.com → Add New → Project**, importar el repositorio.
+3. No hay que tocar ninguna configuración: `vercel.json` ya define el build
+   (`npm --prefix frontend run build`) y la carpeta de salida (`frontend/dist`).
+4. **Deploy**. Queda en `https://<nombre>.vercel.app` y se actualiza solo con cada
+   push.
+
+O desde la terminal, sin pasar por GitHub:
+
+```bash
+npx vercel            # la primera vez pide iniciar sesión y crear el proyecto
+npx vercel --prod     # publica la versión definitiva
+```
+
+El backend Fastify **no** va a Vercel: necesita un PostgreSQL y un proceso vivo.
+Para cuando haga falta, la ruta corta es Supabase (o Neon) para la base y las
+funciones de Vercel para la API. La demo no lo necesita.
+
 ### Con la API real (para más adelante)
 
 El backend quedó intacto, pero el frontend hoy no lo usa: para volver a conectarlo
@@ -137,6 +167,8 @@ abriendo los sensores de Pesquera Atlántico Sur (plan Starter), vuelve a recibi
 
 ```
 oceanos/
+├── docs/ECONOMIA-DE-TOKENS.md      Qué cambió respecto de la tabla de los documentos
+├── vercel.json                     Build y rewrite de SPA para el plan gratuito
 ├── database/
 │   ├── migrations/001_init.sql     Esquema completo con vistas calculadas
 │   └── seeds/001_demo.sql          Zonas y especies reales de Chubut
@@ -199,6 +231,21 @@ API real, conviene pasarle estos mismos valores.
 
 **Verificación.** Si el clasificador queda por debajo del 80% de confianza, el
 reporte va a votación: tres votos ponderados por reputación lo resuelven.
+
+**El flujo de n8n vive en la base.** El MER entregado abstrae la relación entre
+usuario y avistamiento como una entidad de alto nivel y la vincula con los flujos
+de automatización. Esa agregación es `n8n_trigger_log`: cada fila dice qué reporte,
+de qué usuario, disparó qué nodo y cómo terminó. El alta de un avistamiento corre
+el flujo completo dentro de la misma transacción —si el reporte no queda, el
+registro tampoco— y `/panel/automatizaciones` lo muestra con el diagrama y las
+últimas corridas. n8n de verdad no corre en ningún lado: lo que existe es el modelo
+de datos que lo sostiene.
+
+**Los premios en tokens no son los de los documentos.** La tabla de
+`OceanOS_Plan_Startup-MVP.pdf` dice 15/25/50/10/100; la plataforma aplica
+0/15/33/10/65. El cambio es deliberado y está justificado en
+[docs/ECONOMIA-DE-TOKENS.md](docs/ECONOMIA-DE-TOKENS.md), junto con la lista de
+documentos que hay que actualizar.
 
 ---
 

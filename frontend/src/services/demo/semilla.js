@@ -18,7 +18,7 @@
  */
 
 /** Subir este número invalida lo guardado en sessionStorage si cambia la forma del estado. */
-export const VERSION = 11;
+export const VERSION = 12;
 
 export const DIA = 24 * 3600 * 1000;
 const HORA = 3600 * 1000;
@@ -49,6 +49,11 @@ const E = (n) => `22222222-0000-0000-0000-00000000000${n}`;
 const O = (n) => `44444444-0000-0000-0000-00000000000${n}`;
 const P = (n) => `55555555-0000-0000-0000-00000000000${n}`;
 const L = (n) => `99999999-0000-0000-0000-00000000000${n}`;
+const N = (n) => `88888888-0000-0000-0000-00000000000${n}`;
+
+// Condición del triage del flujo n8n, igual que en el diagrama entregado.
+const UMBRAL_TRIAGE = 0.8;
+const AMENAZADAS = new Set(['VU', 'EN', 'CR']);
 
 /**
  * Generador pseudoaleatorio con semilla (mulberry32). El SQL usa random()
@@ -96,6 +101,7 @@ export const nuevoId = () =>
 export function crearSemilla(ahora = Date.now()) {
   const hace = (dias, horas = 0) => new Date(ahora - dias * DIA - horas * HORA).toISOString();
   const mas = (iso, horas) => new Date(new Date(iso).getTime() + horas * HORA).toISOString();
+  const masSeg = (iso, segundos) => new Date(new Date(iso).getTime() + segundos * 1000).toISOString();
   const r6 = (x) => redondear(x, 6);
   let secuencia = 0;
   const idSemilla = (letra) => `${letra}0000000-0000-4000-8000-${String(++secuencia).padStart(12, '0')}`;
@@ -145,11 +151,11 @@ export function crearSemilla(ahora = Date.now()) {
   const hoy = claveDia(ahora);
   const diaMenos = (n) => claveDia(ahora - n * DIA);
   const usuarios = [
-    { id: U.admin,    email: 'admin@oceanos.ar',    full_name: 'Lautaro Martinez', role: 'admin',        home_zone_id: Z.golfoNuevo, reputation: 1000, streak_days: 0,  last_report_on: null,        created_at: hace(400) },
-    { id: U.buzo,     email: 'buzo@oceanos.ar',     full_name: 'Gabriel Maculus',  role: 'ciudadano',    home_zone_id: Z.golfoNuevo, reputation: 480,  streak_days: 12, last_report_on: hoy,         created_at: hace(214) },
-    { id: U.leandro,  email: 'leandro@oceanos.ar',  full_name: 'Leandro Orozco',   role: 'ciudadano',    home_zone_id: Z.golfoNuevo, reputation: 320,  streak_days: 5,  last_report_on: diaMenos(1), created_at: hace(180) },
-    { id: U.otar,     email: 'otar@oceanos.ar',     full_name: 'Otar',             role: 'ciudadano',    home_zone_id: Z.sanJose,    reputation: 640,  streak_days: 21, last_report_on: hoy,         created_at: hace(260) },
-    { id: U.jose,     email: 'jose@oceanos.ar',     full_name: 'Jose Rodriguez',   role: 'organizacion', home_zone_id: Z.valdes,     reputation: 100,  streak_days: 0,  last_report_on: null,        created_at: hace(290) },
+    { id: U.admin,    documento: '44812309', email: 'admin@oceanos.ar',    full_name: 'Lautaro Martinez', role: 'admin',        home_zone_id: Z.golfoNuevo, reputation: 1000, streak_days: 0,  last_report_on: null,        created_at: hace(400) },
+    { id: U.buzo,     documento: '41250877', email: 'buzo@oceanos.ar',     full_name: 'Gabriel Maculus',  role: 'ciudadano',    home_zone_id: Z.golfoNuevo, reputation: 480,  streak_days: 12, last_report_on: hoy,         created_at: hace(214) },
+    { id: U.leandro,  documento: '43907165', email: 'leandro@oceanos.ar',  full_name: 'Leandro Orozco',   role: 'ciudadano',    home_zone_id: Z.golfoNuevo, reputation: 320,  streak_days: 5,  last_report_on: diaMenos(1), created_at: hace(180) },
+    { id: U.otar,     documento: '40118542', email: 'otar@oceanos.ar',     full_name: 'Otar',             role: 'ciudadano',    home_zone_id: Z.sanJose,    reputation: 640,  streak_days: 21, last_report_on: hoy,         created_at: hace(260) },
+    { id: U.jose,     documento: '38264910', email: 'jose@oceanos.ar',     full_name: 'Jose Rodriguez',   role: 'organizacion', home_zone_id: Z.valdes,     reputation: 100,  streak_days: 0,  last_report_on: null,        created_at: hace(290) },
     // La cuenta de la demo arranca de cero: sin reportes (así el ranking es
     // solo de los reportes de ejemplo) y con la reputación inicial de la base.
     { id: U.oceanos,  email: 'demo@oceanos.ar',     full_name: 'OceanOS',          role: 'ciudadano',    home_zone_id: Z.golfoNuevo, reputation: 100,  streak_days: 0,  last_report_on: null,        created_at: hace(0, 2) },
@@ -416,10 +422,69 @@ export function crearSemilla(ahora = Date.now()) {
       units: 11, unit_price_usd: 3800, gross_usd: 41800, commission_usd: 3344, status: 'liquidada', created_at: hace(20) },
   ];
 
+  // ---------- AUTOMATIZACIÓN n8n ----------------------------------------
+  // Los cinco nodos del flujo que se entregó junto al MER. El registro de
+  // disparos no se escribe a mano: sale de los mismos avistamientos, con
+  // la condición del triage tal cual figura en el diagrama.
+  const flujos = [
+    { id: N(1), slug: 'webhook_avistamiento', process_name: 'Webhook · alta de avistamiento',   node_kind: 'webhook',    step_order: 1,
+      description: 'Recibe el alta de la tabla de avistamientos y arranca el flujo.' },
+    { id: N(2), slug: 'triage_confianza',     process_name: 'Triage lógico',                    node_kind: 'condicion',  step_order: 2,
+      description: 'Evalúa si la confianza de la IA supera el 80% y si la especie está amenazada.' },
+    { id: N(3), slug: 'alerta_ong',           process_name: 'Alerta a ONG y áreas protegidas',  node_kind: 'whatsapp',   step_order: 3,
+      description: 'Rama verdadera: avisa por WhatsApp a la ONG o al área protegida de la zona.' },
+    { id: N(4), slug: 'acreditacion_okn',     process_name: 'Acreditación de tokens OKN',       node_kind: 'base_datos', step_order: 3,
+      description: 'Rama falsa: con el reporte verificado, acredita los OKN en el saldo del usuario.' },
+    { id: N(5), slug: 'aviso_usuario',        process_name: 'Aviso de acreditación',            node_kind: 'email',      step_order: 4,
+      description: 'Le escribe al usuario para avisarle que sus tokens quedaron acreditados.' },
+  ];
+
+  const disparos = [];
+  const disparo = (flujo, s, run_status, detail, segundos) => disparos.push({
+    id: idSemilla('e'), user_id: s.user_id, sighting_id: s.id, workflow_id: flujo,
+    run_status, detail, triggered_at: masSeg(s.resolved_at ?? s.observed_at, segundos),
+  });
+
+  for (const s of avistamientos) {
+    const esp = especies.find((e) => e.id === s.species_id);
+    const conf = s.ai_confidence;
+
+    disparos.push({
+      id: idSemilla('e'), user_id: s.user_id, sighting_id: s.id, workflow_id: N(1),
+      run_status: 'exito', detail: 'Alta recibida', triggered_at: masSeg(s.observed_at, 4),
+    });
+    disparos.push({
+      id: idSemilla('e'), user_id: s.user_id, sighting_id: s.id, workflow_id: N(2),
+      run_status: 'exito',
+      detail: conf != null ? `Confianza ${Math.round(conf * 100)}%` : 'Sin clasificar',
+      triggered_at: masSeg(s.observed_at, 6),
+    });
+
+    // Rama verdadera del triage: especie amenazada y por encima del umbral.
+    if (conf != null && conf > UMBRAL_TRIAGE && esp && AMENAZADAS.has(esp.iucn_status)) {
+      const zona = zonas.find((z) => z.id === s.zone_id);
+      disparos.push({
+        id: idSemilla('e'), user_id: s.user_id, sighting_id: s.id, workflow_id: N(3),
+        run_status: 'exito',
+        detail: `Aviso enviado por ${zona?.name ?? 'la zona'} · ${esp.common_name} (${esp.iucn_status})`,
+        triggered_at: masSeg(s.observed_at, 9),
+      });
+    }
+
+    // Rama falsa: la acreditación espera a que el reporte quede verificado.
+    if (s.status === 'verificado') {
+      disparo(N(4), s, 'exito', 'Saldo actualizado', 12);
+      disparo(N(5), s, 'exito', 'Correo enviado al usuario', 15);
+    } else if (s.status === 'pendiente' || s.status === 'en_votacion') {
+      disparo(N(4), s, 'omitido', 'A la espera de que la comunidad resuelva la votación', 12);
+    }
+  }
+
   return {
     version: VERSION,
     creado: ahora,
     zonas, especies, usuarios, organizaciones, proyectos, hitos, sensores,
     avistamientos, votos, libro, recompensas, canjes: [], creditos, listados, ordenes,
+    flujos, disparos,
   };
 }

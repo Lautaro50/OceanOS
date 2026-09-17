@@ -62,15 +62,15 @@ INSERT INTO plan_limits (plan, max_projects, max_members, monthly_usd, has_iot, 
 
 -- ---------- USUARIOS -------------------------------------------------
 -- Contraseña de todas las cuentas: oceano1234
-INSERT INTO users (id, email, password_hash, full_name, role, home_zone_id, reputation, streak_days, last_report_on) VALUES
- ('33333333-0000-0000-0000-000000000001','admin@oceanos.ar',    '$2b$10$E7BT.7s9B5RaZTZeV7pH6uwVOFAf0snpvF09fjRnhBnvhhGLm4rxK','Lautaro Martinez','admin',       '11111111-0000-0000-0000-000000000001',1000, 0,NULL),
- ('33333333-0000-0000-0000-000000000002','buzo@oceanos.ar',     '$2b$10$E7BT.7s9B5RaZTZeV7pH6uwVOFAf0snpvF09fjRnhBnvhhGLm4rxK','Gabriel Maculus','ciudadano',    '11111111-0000-0000-0000-000000000001', 480,12,CURRENT_DATE),
- ('33333333-0000-0000-0000-000000000003','leandro@oceanos.ar',  '$2b$10$E7BT.7s9B5RaZTZeV7pH6uwVOFAf0snpvF09fjRnhBnvhhGLm4rxK','Leandro Orozco','ciudadano',     '11111111-0000-0000-0000-000000000001', 320, 5,CURRENT_DATE - 1),
- ('33333333-0000-0000-0000-000000000005','otar@oceanos.ar',     '$2b$10$E7BT.7s9B5RaZTZeV7pH6uwVOFAf0snpvF09fjRnhBnvhhGLm4rxK','Otar','ciudadano',               '11111111-0000-0000-0000-000000000003', 640, 21,CURRENT_DATE),
- ('33333333-0000-0000-0000-000000000008','jose@oceanos.ar',     '$2b$10$E7BT.7s9B5RaZTZeV7pH6uwVOFAf0snpvF09fjRnhBnvhhGLm4rxK','Jose Rodriguez','organizacion',  '11111111-0000-0000-0000-000000000002', 100, 0,NULL),
+INSERT INTO users (id, documento, email, password_hash, full_name, role, home_zone_id, reputation, streak_days, last_report_on) VALUES
+ ('33333333-0000-0000-0000-000000000001','44812309','admin@oceanos.ar',    '$2b$10$E7BT.7s9B5RaZTZeV7pH6uwVOFAf0snpvF09fjRnhBnvhhGLm4rxK','Lautaro Martinez','admin',       '11111111-0000-0000-0000-000000000001',1000, 0,NULL),
+ ('33333333-0000-0000-0000-000000000002','41250877','buzo@oceanos.ar',     '$2b$10$E7BT.7s9B5RaZTZeV7pH6uwVOFAf0snpvF09fjRnhBnvhhGLm4rxK','Gabriel Maculus','ciudadano',    '11111111-0000-0000-0000-000000000001', 480,12,CURRENT_DATE),
+ ('33333333-0000-0000-0000-000000000003','43907165','leandro@oceanos.ar',  '$2b$10$E7BT.7s9B5RaZTZeV7pH6uwVOFAf0snpvF09fjRnhBnvhhGLm4rxK','Leandro Orozco','ciudadano',     '11111111-0000-0000-0000-000000000001', 320, 5,CURRENT_DATE - 1),
+ ('33333333-0000-0000-0000-000000000005','40118542','otar@oceanos.ar',     '$2b$10$E7BT.7s9B5RaZTZeV7pH6uwVOFAf0snpvF09fjRnhBnvhhGLm4rxK','Otar','ciudadano',               '11111111-0000-0000-0000-000000000003', 640, 21,CURRENT_DATE),
+ ('33333333-0000-0000-0000-000000000008','38264910','jose@oceanos.ar',     '$2b$10$E7BT.7s9B5RaZTZeV7pH6uwVOFAf0snpvF09fjRnhBnvhhGLm4rxK','Jose Rodriguez','organizacion',  '11111111-0000-0000-0000-000000000002', 100, 0,NULL),
  -- Cuenta del proyecto, la que se usa para mostrar la app: no es de ningún
  -- integrante y arranca sin reportes.
- ('33333333-0000-0000-0000-000000000009','demo@oceanos.ar',     '$2b$10$E7BT.7s9B5RaZTZeV7pH6uwVOFAf0snpvF09fjRnhBnvhhGLm4rxK','OceanOS','ciudadano',           '11111111-0000-0000-0000-000000000001', 100, 0,NULL);
+ ('33333333-0000-0000-0000-000000000009',NULL,'demo@oceanos.ar',     '$2b$10$E7BT.7s9B5RaZTZeV7pH6uwVOFAf0snpvF09fjRnhBnvhhGLm4rxK','OceanOS','ciudadano',           '11111111-0000-0000-0000-000000000001', 100, 0,NULL);
 
 -- ---------- ORGANIZACIONES ------------------------------------------
 INSERT INTO organizations (id, slug, name, kind, plan, contact_email) VALUES
@@ -258,6 +258,7 @@ INSERT INTO token_ledger (user_id, amount, reason, detail, created_at) VALUES
  ('33333333-0000-0000-0000-000000000005', 33,'racha_semanal','Racha de 7 días', now() - interval '9 days'),
  ('33333333-0000-0000-0000-000000000005', 65,'zona_nueva','Primer reporte en Golfo San José', now() - interval '30 days'),
  ('33333333-0000-0000-0000-000000000001', 10,'voto_comunidad','Voto en reporte de baja confianza', now() - interval '1 day'),
+ ('33333333-0000-0000-0000-000000000003', 10,'voto_comunidad','Voto en reporte de baja confianza', now() - interval '6 hours'),
  ('33333333-0000-0000-0000-000000000009',200,'ajuste','Bienvenida a la cuenta de demostración', now() - interval '2 hours');
 
 -- ---------- RECOMPENSAS ---------------------------------------------
@@ -292,5 +293,68 @@ INSERT INTO orders (listing_id, buyer_org_id, buyer_name, buyer_email, units, un
  ('99999999-0000-0000-0000-000000000001',NULL,'Bodega Valle Azul','sustentabilidad@vallazul.ar', 200.000, 42.00,  8400.00,  840.00,'pagada',    now() - interval '9 days'),
  ('99999999-0000-0000-0000-000000000002',NULL,'Fondo Patagonia ESG','deals@patagoniaesg.com',    410.000, 51.00, 20910.00, 2509.20,'pagada',    now() - interval '5 days'),
  ('99999999-0000-0000-0000-000000000003',NULL,'Grupo Litoral','rse@grupolitoral.com.ar',          11.000,3800.00, 41800.00, 3344.00,'liquidada', now() - interval '20 days');
+
+-- ---------------------------------------------------------------------
+-- Automatización n8n
+-- Los cinco nodos del flujo entregado en el MER, y el registro de qué
+-- reporte disparó cuál. El log no se escribe a mano: se deriva de los
+-- avistamientos, igual que el resto de las métricas del proyecto.
+-- ---------------------------------------------------------------------
+INSERT INTO n8n_workflows (id, slug, process_name, node_kind, step_order, description) VALUES
+ ('88888888-0000-0000-0000-000000000001','webhook_avistamiento','Webhook · alta de avistamiento','webhook',1,
+  'Recibe el INSERT de la tabla de avistamientos y arranca el flujo.'),
+ ('88888888-0000-0000-0000-000000000002','triage_confianza','Triage lógico','condicion',2,
+  'Evalúa si la confianza de la IA supera el 80% y si la especie está amenazada.'),
+ ('88888888-0000-0000-0000-000000000003','alerta_ong','Alerta a ONG y áreas protegidas','whatsapp',3,
+  'Rama verdadera: avisa por WhatsApp a la ONG o al área protegida de la zona.'),
+ ('88888888-0000-0000-0000-000000000004','acreditacion_okn','Acreditación de tokens OKN','base_datos',3,
+  'Rama falsa: una vez verificado el reporte, acredita los OKN en el saldo del usuario.'),
+ ('88888888-0000-0000-0000-000000000005','aviso_usuario','Aviso de acreditación','email',4,
+  'Le escribe al usuario para avisarle que sus tokens quedaron acreditados.');
+
+-- Nodo 1 y 2: corren para todo reporte, sin excepción.
+INSERT INTO n8n_trigger_log (user_id, sighting_id, workflow_id, run_status, detail, triggered_at)
+SELECT s.user_id, s.id, w.id, 'exito',
+       CASE w.slug WHEN 'webhook_avistamiento' THEN 'Alta recibida'
+                   ELSE 'Confianza ' || COALESCE(round(s.ai_confidence * 100)::text || '%', 'sin clasificar') END,
+       s.observed_at + interval '4 seconds'
+FROM sightings s
+CROSS JOIN n8n_workflows w
+WHERE w.slug IN ('webhook_avistamiento','triage_confianza');
+
+-- Nodo 3, rama verdadera: especie amenazada reconocida con más del 80%.
+INSERT INTO n8n_trigger_log (user_id, sighting_id, workflow_id, run_status, detail, triggered_at)
+SELECT s.user_id, s.id, w.id, 'exito',
+       'Aviso enviado por ' || z.name || ' · ' || sp.common_name || ' (' || sp.iucn_status || ')',
+       s.observed_at + interval '9 seconds'
+FROM sightings s
+JOIN species sp ON sp.id = s.species_id
+JOIN zones z    ON z.id  = s.zone_id
+CROSS JOIN n8n_workflows w
+WHERE w.slug = 'alerta_ong'
+  AND s.ai_confidence > 0.80
+  AND sp.iucn_status IN ('VU','EN','CR');
+
+-- Nodos 3 y 4, rama falsa: el reporte queda verificado y se paga.
+INSERT INTO n8n_trigger_log (user_id, sighting_id, workflow_id, run_status, detail, triggered_at)
+SELECT s.user_id, s.id, w.id, 'exito',
+       CASE w.slug WHEN 'acreditacion_okn' THEN 'Saldo actualizado'
+                   ELSE 'Correo enviado al usuario' END,
+       COALESCE(s.resolved_at, s.observed_at) + interval '12 seconds'
+FROM sightings s
+CROSS JOIN n8n_workflows w
+WHERE w.slug IN ('acreditacion_okn','aviso_usuario')
+  AND s.status = 'verificado';
+
+-- Reportes todavía en votación: la acreditación queda pendiente.
+INSERT INTO n8n_trigger_log (user_id, sighting_id, workflow_id, run_status, detail, triggered_at)
+SELECT s.user_id, s.id, w.id, 'omitido',
+       'A la espera de que la comunidad resuelva la votación',
+       s.observed_at + interval '12 seconds'
+FROM sightings s
+CROSS JOIN n8n_workflows w
+WHERE w.slug = 'acreditacion_okn'
+  AND s.status IN ('pendiente','en_votacion');
+
 
 COMMIT;

@@ -29,6 +29,7 @@ const Resumen         = lazy(() => import('./pages/panel/Resumen.jsx'));
 const Proyectos       = lazy(() => import('./pages/panel/Proyectos.jsx'));
 const ProyectoDetalle = lazy(() => import('./pages/panel/ProyectoDetalle.jsx'));
 const Sensores        = lazy(() => import('./pages/panel/Sensores.jsx'));
+const Automatizaciones = lazy(() => import('./pages/panel/Automatizaciones.jsx'));
 
 function NoEncontrado() {
   return (
@@ -84,6 +85,7 @@ function Rutas() {
         <Route path="proyectos" element={<Proyectos />} />
         <Route path="proyectos/:id" element={<ProyectoDetalle />} />
         <Route path="sensores" element={<Sensores />} />
+        <Route path="automatizaciones" element={<Automatizaciones />} />
       </Route>
     </Routes>
   );

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import {
   ArrowRight, Map, PlusCircle, CheckSquare, Wallet, User, Waves, ChartLine,
-  LayoutDashboard, FolderKanban, Radio, Store, ShoppingCart, RotateCcw, Coins,
+  LayoutDashboard, FolderKanban, Radio, Store, ShoppingCart, RotateCcw, Coins, Workflow,
 } from 'lucide-react';
 import { useDemo } from '../../contexts/DemoContext.jsx';
 import { useReglas } from '../../hooks/useReglas.js';
@@ -54,6 +54,7 @@ const CAPAS = [
       { icono: LayoutDashboard, titulo: 'Resumen',           texto: 'Hectáreas, carbono certificado, amenazas en tus zonas y hitos pendientes.', a: '/panel' },
       { icono: FolderKanban,    titulo: 'Proyectos',         texto: 'Creá un proyecto, agregale hitos, marcalos hechos y actualizá las hectáreas.', a: '/panel/proyectos' },
       { icono: Radio,           titulo: 'Sensores IoT',      texto: 'Temperatura, salinidad, biomasa, turbidez, oxígeno y pH de los últimos 30 días.', a: '/panel/sensores' },
+      { icono: Workflow,        titulo: 'Automatizaciones',  texto: 'El flujo de n8n: qué reporte disparó qué nodo, con la alerta a la ONG y la acreditación de tokens.', a: '/panel/automatizaciones' },
     ],
   },
   {
