@@ -64,6 +64,34 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Textura analógica global (ruido de monitor/papel) */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Scrollbar estilo instrumental náutico */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-abismo);
+    border-left: 1px solid var(--color-columna);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-columna);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-kelp);
+  }
+
   /* Los números de la interfaz son sondas: siempre tabulares, para que
      las columnas de datos queden alineadas verticalmente. */
   .cifra {
@@ -97,14 +125,21 @@
 }
 
 /* Encabezados públicos: una corriente muy leve que agrega profundidad sin
-   competir con el mapa ni con los datos. */
+   competir con el mapa ni con los datos. Sumamos curvas batimétricas. */
 .hero-ocean {
   isolation: isolate;
   overflow: hidden;
   position: relative;
+  background-color: var(--color-abismo);
   background-image:
+    /* Gradiente para asentar el texto */
+    radial-gradient(ellipse at 50% 0%, rgb(16 57 74 / 0.6) 0%, transparent 60%),
+    /* Topografía/Batimetría en SVG (data URI) */
+    url("data:image/svg+xml,%3Csvg width='800' height='800' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 100C150 150 250 50 400 100S650 150 800 100M0 300C200 350 300 200 400 250S650 300 800 250M0 500C100 450 300 550 400 500S700 450 800 500M0 700C200 650 300 750 400 700S600 650 800 700' stroke='%237FB5B0' stroke-width='1.5' fill='none' opacity='0.04'/%3E%3Cpath d='M0 200C150 250 250 150 400 200S650 250 800 200M0 400C200 450 300 300 400 350S650 400 800 350M0 600C100 550 300 650 400 600S700 550 800 600' stroke='%237FB5B0' stroke-width='0.5' fill='none' opacity='0.02'/%3E%3C/svg%3E"),
+    /* Degradado lineal sutil */
     linear-gradient(115deg, rgb(4 32 43 / 0.25), transparent 55%),
     repeating-linear-gradient(0deg, transparent 0 42px, rgb(127 181 176 / 0.045) 43px, transparent 44px);
+  background-size: 100% 100%, 800px 800px, 100% 100%, 100% 100%;
 }
 .hero-ocean::before,
 .hero-ocean::after {
@@ -117,6 +152,23 @@
 }
 .hero-ocean::before { height: 34rem; right: -15rem; top: -20rem; width: 34rem; }
 .hero-ocean::after  { height: 22rem; right: -9rem; top: -14rem; width: 22rem; }
+
+/* ---------------------------------------------------------------------
+   Animaciones de fluido/revelado (Scroll Reveals y carga inicial)
+   --------------------------------------------------------------------- */
+@keyframes revelar-agua {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animar-flotar {
+  opacity: 0;
+  animation: revelar-agua 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.retraso-1 { animation-delay: 150ms; }
+.retraso-2 { animation-delay: 300ms; }
+.retraso-3 { animation-delay: 450ms; }
+.retraso-4 { animation-delay: 600ms; }
 
 .mapa-marco {
   border: 1px solid rgb(127 181 176 / 0.35);
@@ -223,3 +275,18 @@
 /* Al reportar, el cursor dice "marcá acá" en vez de "arrastrá". */
 .mapa-marcar .leaflet-container,
 .mapa-marcar .leaflet-container.leaflet-grab { cursor: crosshair; }
+
+/* ---------------------------------------------------------------------
+   Recharts en modo noche (Glow y Glassmorphism)
+   --------------------------------------------------------------------- */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background-color: rgb(10 46 60 / 0.85) !important;
+  border: 1px solid var(--color-trazo) !important;
+  border-radius: var(--radius-carta);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgb(4 32 43 / 0.5);
+  color: var(--color-carta) !important;
+}
+.recharts-tooltip-item-name, .recharts-tooltip-item-separator {
+  color: var(--color-sonda) !important;
+}

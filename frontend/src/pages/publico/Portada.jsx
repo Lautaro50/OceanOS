@@ -3,6 +3,7 @@ import { Activity, ArrowRight } from 'lucide-react';
 import { useFetch } from '../../hooks/useFetch.js';
 import MapaZona, { LeyendaMapa } from '../../components/mapa/MapaZona.jsx';
 import { Boton, Barra } from '../../components/ui/index.jsx';
+import Revelar from '../../components/ui/Revelar.jsx';
 import { numero, dolares, colorSalud } from '../../utils/format.js';
 
 /**
@@ -51,29 +52,29 @@ export default function Portada() {
 
   return (
     <>
-      {/* ---------------- HERO: el mapa es el titular ---------------- */}
+        {/* ---------------- HERO: el mapa es el titular ---------------- */}
       <section className="hero-ocean border-b border-columna bg-abismo px-5 pb-12 pt-7 text-carta lg:px-10">
         <div className="relative z-10 mx-auto max-w-5xl">
-          <p className="flex items-center gap-2 text-sm text-sonda"><Activity size={14} className="text-alga" /> Golfo Nuevo, Chubut · datos de demostración</p>
-          <h1 className="mt-3 max-w-2xl font-display text-4xl leading-[1.08] font-600 sm:text-5xl">
+          <p className="animar-flotar flex items-center gap-2 text-sm text-sonda"><Activity size={14} className="text-alga" /> Golfo Nuevo, Chubut · datos de demostración</p>
+          <h1 className="animar-flotar retraso-1 mt-3 max-w-2xl font-display text-4xl leading-[1.08] font-600 sm:text-5xl">
             El 90% del bosque de cachiyuyo del Atlántico Sur desapareció desde 1990.
           </h1>
-          <p className="mt-4 max-w-xl text-lg text-sonda">
+          <p className="animar-flotar retraso-2 mt-4 max-w-xl text-lg text-sonda">
             Este mapa muestra lo que queda, reportado por la gente que se mete al agua.
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="animar-flotar retraso-3 mt-6 flex flex-wrap gap-3">
             <Link to="/funciones"><Boton variante="kelp">Probar la demo <ArrowRight size={15} /></Boton></Link>
             <Link to="/ecosistema"><Boton variante="lineaClara">Explorar el ecosistema</Boton></Link>
           </div>
 
-          <div className="mapa-marco mt-8">
+          <div className="animar-flotar retraso-4 mapa-marco mt-8">
             <MapaZona zona={golfo} avistamientos={avist?.avistamientos ?? []} alto={400} />
           </div>
-          <LeyendaMapa className="mt-3 text-sonda/80" />
+          <LeyendaMapa className="animar-flotar retraso-4 mt-3 text-sonda/80" />
 
           {/* Las cuatro sondas del sistema */}
-          <dl className="metric-grid mt-10 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-columna pt-8 lg:grid-cols-4">
+          <dl className="animar-flotar retraso-4 metric-grid mt-10 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-columna pt-8 lg:grid-cols-4">
             {[
               { v: numero(indicadores?.reportes_verificados), r: 'reportes verificados' },
               { v: numero(indicadores?.hectareas_en_restauracion, 1), u: 'ha', r: 'en restauración' },
@@ -93,8 +94,8 @@ export default function Portada() {
       </section>
 
       {/* ---------------- EL PROBLEMA ---------------- */}
-      <section className="px-5 py-16 lg:px-10">
-        <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[1fr_1.3fr]">
+      <section className="px-5 py-16 lg:px-10 overflow-hidden">
+        <Revelar className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[1fr_1.3fr]">
           <h2 className="font-display text-2xl leading-tight font-600">
             Sin tiburones, el bosque se cae solo
           </h2>
@@ -114,24 +115,26 @@ export default function Portada() {
               verificables no hay certificación, y sin certificación no hay financiamiento.
             </p>
           </div>
-        </div>
+        </Revelar>
       </section>
 
       {/* ---------------- LAS TRES CAPAS, POR PROFUNDIDAD ---------------- */}
-      <section className="border-t border-trazo bg-papel px-5 py-16 lg:px-10">
+      <section className="border-t border-trazo bg-papel px-5 py-16 lg:px-10 overflow-hidden">
         <div className="mx-auto max-w-5xl">
-          <h2 className="max-w-lg font-display text-2xl leading-tight font-600">
-            Tres capas, una sola columna de agua
-          </h2>
-          <p className="mt-3 max-w-xl text-[15px] text-tinta">
-            Cada capa produce el dato que la de abajo necesita. Por eso el sistema se
-            sostiene: sin reportes de la gente no hay dashboard que vender, y sin dashboard
-            no hay carbono que certificar.
-          </p>
+          <Revelar>
+            <h2 className="max-w-lg font-display text-2xl leading-tight font-600">
+              Tres capas, una sola columna de agua
+            </h2>
+            <p className="mt-3 max-w-xl text-[15px] text-tinta">
+              Cada capa produce el dato que la de abajo necesita. Por eso el sistema se
+              sostiene: sin reportes de la gente no hay dashboard que vender, y sin dashboard
+              no hay carbono que certificar.
+            </p>
+          </Revelar>
 
           <ol className="mt-12 space-y-0">
             {CAPAS.map((capa, i) => (
-              <li key={capa.lugar} className="grid gap-6 md:grid-cols-[110px_1fr]">
+              <Revelar key={capa.lugar} as="li" retraso={i * 200} className="grid gap-6 md:grid-cols-[110px_1fr]">
                 {/* Columna de sonda: la profundidad es el marcador */}
                 <div className="flex gap-4 md:flex-col md:items-end md:text-right">
                   <div>
@@ -152,55 +155,59 @@ export default function Portada() {
                     <span className="text-sm text-tinta/70">{capa.dato}</span>
                   </div>
                 </div>
-              </li>
+              </Revelar>
             ))}
           </ol>
         </div>
       </section>
 
       {/* ---------------- SALUD POR ZONA ---------------- */}
-      <section className="px-5 py-16 lg:px-10">
+      <section className="px-5 py-16 lg:px-10 overflow-hidden">
         <div className="mx-auto max-w-5xl">
-          <div className="flex flex-wrap items-baseline justify-between gap-4">
+          <Revelar className="flex flex-wrap items-baseline justify-between gap-4">
             <h2 className="font-display text-2xl font-600">Cómo está cada zona hoy</h2>
             <Link to="/ecosistema" className="text-sm underline underline-offset-4 hover:text-kelp">
               Ver el detalle
             </Link>
-          </div>
+          </Revelar>
 
           <div className="mt-8 divide-y divide-trazo border-y border-trazo">
-            {(zonasData?.zonas ?? []).map((z) => (
-              <Link key={z.slug} to={`/ecosistema/${z.slug}`}
-                    className="grid grid-cols-[1fr_auto] items-center gap-4 py-4 hover:bg-papel sm:grid-cols-[1.2fr_1fr_auto]">
-                <div>
-                  <p className="font-500">{z.name}</p>
-                  <p className="text-sm text-tinta/70">
-                    {z.province}{z.is_protected && ' · área protegida'}
+            {(zonasData?.zonas ?? []).map((z, i) => (
+              <Revelar key={z.slug} retraso={i * 150} direccion="izquierda">
+                <Link to={`/ecosistema/${z.slug}`}
+                      className="grid grid-cols-[1fr_auto] items-center gap-4 py-4 hover:bg-papel sm:grid-cols-[1.2fr_1fr_auto] transition-colors">
+                  <div>
+                    <p className="font-500">{z.name}</p>
+                    <p className="text-sm text-tinta/70">
+                      {z.province}{z.is_protected && ' · área protegida'}
+                    </p>
+                  </div>
+                  <div className="hidden sm:block">
+                    <Barra valor={z.health_index} color={colorSalud(z.health_index)} />
+                    <p className="mt-1.5 text-xs text-tinta/70">
+                      cachiyuyo {numero(z.kelp_cobertura_pct, 1)}% · {z.avistamientos_tiburon} tiburones · {z.amenazas_abiertas} amenazas
+                    </p>
+                  </div>
+                  <p className="cifra font-display text-2xl font-600"
+                     style={{ color: colorSalud(z.health_index) }}>
+                    {numero(z.health_index, 1)}
                   </p>
-                </div>
-                <div className="hidden sm:block">
-                  <Barra valor={z.health_index} color={colorSalud(z.health_index)} />
-                  <p className="mt-1.5 text-xs text-tinta/70">
-                    cachiyuyo {numero(z.kelp_cobertura_pct, 1)}% · {z.avistamientos_tiburon} tiburones · {z.amenazas_abiertas} amenazas
-                  </p>
-                </div>
-                <p className="cifra font-display text-2xl font-600"
-                   style={{ color: colorSalud(z.health_index) }}>
-                  {numero(z.health_index, 1)}
-                </p>
-              </Link>
+                </Link>
+              </Revelar>
             ))}
           </div>
-          <p className="mt-3 text-xs text-tinta/70">
-            Índice de salud sobre 100: 50% cobertura de cachiyuyo, 30% presencia de tiburones,
-            20% ausencia de amenazas. Ventana de 90 días.
-          </p>
+          <Revelar retraso={300}>
+            <p className="mt-3 text-xs text-tinta/70">
+              Índice de salud sobre 100: 50% cobertura de cachiyuyo, 30% presencia de tiburones,
+              20% ausencia de amenazas. Ventana de 90 días.
+            </p>
+          </Revelar>
         </div>
       </section>
 
       {/* ---------------- CIERRE ---------------- */}
-      <section className="border-t border-trazo bg-papel px-5 py-16 lg:px-10">
-        <div className="mx-auto max-w-2xl">
+      <section className="border-t border-trazo bg-papel px-5 py-16 lg:px-10 overflow-hidden">
+        <Revelar className="mx-auto max-w-2xl" direccion="arriba">
           <h2 className="font-display text-2xl leading-tight font-600">
             Si te metés al agua en la Patagonia, ya tenés el dato que falta
           </h2>
@@ -212,7 +219,7 @@ export default function Portada() {
             <Link to="/funciones"><Boton variante="kelp">Probar la plataforma</Boton></Link>
             <Link to="/ecosistema"><Boton variante="linea">Ver los datos primero</Boton></Link>
           </div>
-        </div>
+        </Revelar>
       </section>
     </>
   );

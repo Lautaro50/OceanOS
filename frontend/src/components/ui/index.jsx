@@ -1,4 +1,3 @@
-import { Loader2 } from 'lucide-react';
 
 /* ---------------------------------------------------------------------
    Piezas de interfaz. Nada acá lleva sombra: la jerarquía se resuelve
@@ -7,9 +6,9 @@ import { Loader2 } from 'lucide-react';
 
 export function Panel({ children, className = '', oscuro = false }) {
   return (
-    <div className={`rounded-carta border transition-[transform,border-color,background-color] duration-200 ${oscuro
-      ? 'border-columna bg-hondo text-carta'
-      : 'border-trazo bg-papel'} ${className}`}>
+    <div className={`rounded-carta border backdrop-blur-md transition-[transform,border-color,background-color] duration-200 ${oscuro
+      ? 'border-columna/60 bg-hondo/90 text-carta'
+      : 'border-trazo/50 bg-papel/85'} ${className}`}>
       {children}
     </div>
   );
@@ -41,20 +40,29 @@ export function Sonda({ valor, unidad, rotulo, color, className = '' }) {
   );
 }
 
+export function SonarPing({ size = 16, color = 'var(--color-kelp)', opaco = false }) {
+  return (
+    <span className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+      <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style={{ backgroundColor: color }}></span>
+      <span className="relative inline-flex rounded-full" style={{ width: size * 0.4, height: size * 0.4, backgroundColor: opaco ? color : 'var(--color-carta)' }}></span>
+    </span>
+  );
+}
+
 export function Boton({ children, variante = 'principal', className = '', cargando, ...props }) {
-  const base = 'inline-flex items-center justify-center gap-2 rounded-carta px-4 py-2.5 text-sm font-500 transition-[transform,background-color,border-color,color,box-shadow] duration-200 hover:-translate-y-px active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0';
+  const base = 'inline-flex items-center justify-center gap-2 rounded-carta px-4 py-2.5 text-sm font-500 transition-all duration-300 hover:-translate-y-px active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0';
   const variantes = {
     // Sobre agua el primario se invierte: relleno claro, tinta profunda.
     // Con bg-abismo desaparecía contra el fondo de la página.
-    principal: 'bg-carta text-abismo hover:bg-sonda',
-    kelp:      'bg-kelp text-abismo hover:bg-kelp-alto hover:shadow-[0_8px_24px_rgb(200_135_47_/_0.28)]',
+    principal: 'bg-carta text-abismo hover:bg-sonda hover:shadow-[0_0_15px_rgb(127_181_176_/_0.3)]',
+    kelp:      'bg-kelp text-abismo hover:bg-kelp-alto hover:shadow-[0_0_20px_rgb(200_135_47_/_0.4)]',
     linea:     'border border-trazo bg-transparent hover:bg-columna/25',
-    lineaClara:'border border-columna text-carta hover:bg-columna/40',
+    lineaClara:'border border-columna text-carta hover:bg-columna/40 hover:shadow-[0_0_15px_rgb(127_181_176_/_0.2)]',
     texto:     'px-1 underline underline-offset-4 hover:text-kelp',
   };
   return (
     <button className={`${base} ${variantes[variante]} ${className}`} disabled={cargando || props.disabled} {...props}>
-      {cargando && <Loader2 size={15} className="animate-spin" />}
+      {cargando && <SonarPing size={14} color="var(--color-abismo)" opaco />}
       {children}
     </button>
   );
@@ -101,8 +109,8 @@ export const Selector = ({ children, className = '', ...props }) => (
 
 export function Cargando({ texto = 'Cargando' }) {
   return (
-    <div className="flex items-center gap-2 py-10 text-sm text-tinta/70">
-      <Loader2 size={16} className="animate-spin" /> {texto}…
+    <div className="flex items-center gap-3 py-10 text-sm text-tinta/70">
+      <SonarPing size={18} color="var(--color-sonda)" /> {texto}…
     </div>
   );
 }
