@@ -22,14 +22,15 @@ import {
 } from './vistas.js';
 import { badRequest, forbidden, notFound } from '../errores.js';
 
-// Los mismos valores que backend/src/services/sightings.service.js.
-// Reportar no paga: lo que paga es que el reporte quede verificado.
+// Los mismos valores que backend/src/services/sightings.service.js y el
+// documento fundacional del MVP. Un reporte válido suma y la verificación
+// agrega un segundo premio por la calidad del dato.
 const PREMIOS = {
-  reporte_basico:   0,
-  foto_verificada: 15,
-  racha_semanal:   33,  // bonos al 65%: 50 → 32,5, redondeado a entero
+  reporte_basico:   15,
+  foto_verificada: 25,
+  racha_semanal:   50,
   voto_comunidad:  10,
-  zona_nueva:      65,  // bonos al 65%: 100 → 65
+  zona_nueva:      100,
 };
 const UMBRAL_IA = 0.8;
 const VOTOS_PARA_RESOLVER = 3;

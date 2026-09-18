@@ -18,7 +18,7 @@
  */
 
 /** Subir este número invalida lo guardado en sessionStorage si cambia la forma del estado. */
-export const VERSION = 12;
+export const VERSION = 13;
 
 export const DIA = 24 * 3600 * 1000;
 const HORA = 3600 * 1000;
@@ -351,18 +351,21 @@ export function crearSemilla(ahora = Date.now()) {
 
   // ---------- LIBRO MAYOR DE TOKENS --------------------------------------
   // Igual que en el seed: se deriva de los avistamientos ya cargados.
-  // Reportar no paga; cada reporte verificado paga 15, lo haya verificado
-  // el clasificador o la comunidad.
+  // Cada reporte válido paga 15 y, si queda verificado por el
+  // clasificador o la comunidad, suma otros 25 OKN.
   const libro = [];
   const movimiento = (user_id, amount, reason, created_at, extra = {}) =>
     libro.push({ id: idSemilla('e'), user_id, amount, reason, sighting_id: null, detail: null, created_at, ...extra });
 
-  for (const s of avistamientos.filter((a) => a.status === 'verificado')) {
-    movimiento(s.user_id, 15, 'foto_verificada', s.resolved_at ?? mas(s.created_at, 4), { sighting_id: s.id });
+  for (const s of avistamientos) {
+    movimiento(s.user_id, 15, 'reporte_basico', s.created_at, { sighting_id: s.id });
   }
-  movimiento(U.buzo,    33,  'racha_semanal',  hace(5),     { detail: 'Racha de 7 días' });
-  movimiento(U.otar,    33,  'racha_semanal',  hace(9),     { detail: 'Racha de 7 días' });
-  movimiento(U.otar,    65,  'zona_nueva',     hace(30),    { detail: 'Primer reporte en Golfo San José' });
+  for (const s of avistamientos.filter((a) => a.status === 'verificado')) {
+    movimiento(s.user_id, 25, 'foto_verificada', s.resolved_at ?? mas(s.created_at, 4), { sighting_id: s.id });
+  }
+  movimiento(U.buzo,    50,  'racha_semanal',  hace(5),     { detail: 'Racha de 7 días' });
+  movimiento(U.otar,    50,  'racha_semanal',  hace(9),     { detail: 'Racha de 7 días' });
+  movimiento(U.otar,    100, 'zona_nueva',     hace(30),    { detail: 'Primer reporte en Golfo San José' });
   movimiento(U.admin,   10,  'voto_comunidad', hace(0, 20), { detail: 'Voto en reporte de baja confianza', sighting_id: gatuzo.id });
   movimiento(U.leandro, 10,  'voto_comunidad', hace(0, 6),  { detail: 'Voto en reporte de baja confianza', sighting_id: gatuzo.id });
   // Saldo de bienvenida de la cuenta de la demo. Sin esto el paso "canjeá

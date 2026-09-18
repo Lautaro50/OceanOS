@@ -102,9 +102,8 @@ export default function Reportar() {
           <p className="inline-flex items-center gap-2 font-display text-xl font-600 text-alga">
             <Check size={20} /> Reporte enviado
           </p>
-          {/* Reportar solo no paga: el número grande aparece únicamente si
-              hubo algún premio, como el de zona nueva. Un "+0 OKN" en
-              ámbar se leería como un error. */}
+          {/* El desglose muestra tanto el reporte básico como los premios
+              adicionales, para que el usuario vea de dónde sale el saldo. */}
           {listo.tokensGanados > 0 && (
             <>
               <p className="cifra mt-4 font-display text-4xl font-600 text-kelp">

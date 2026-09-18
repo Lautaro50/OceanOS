@@ -54,6 +54,10 @@
 
   body {
     background-color: var(--color-abismo);
+    background-image:
+      radial-gradient(circle at 8% -10%, rgb(79 165 136 / 0.16), transparent 25rem),
+      radial-gradient(circle at 100% 12%, rgb(111 163 220 / 0.10), transparent 31rem);
+    background-attachment: fixed;
     color: var(--color-tinta);
     font-family: var(--font-sans);
     font-feature-settings: "tnum" 0;
@@ -82,12 +86,63 @@
     outline-offset: 2px;
   }
 
+  ::selection { background: var(--color-kelp); color: var(--color-abismo); }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
     }
   }
+}
+
+/* Encabezados públicos: una corriente muy leve que agrega profundidad sin
+   competir con el mapa ni con los datos. */
+.hero-ocean {
+  isolation: isolate;
+  overflow: hidden;
+  position: relative;
+  background-image:
+    linear-gradient(115deg, rgb(4 32 43 / 0.25), transparent 55%),
+    repeating-linear-gradient(0deg, transparent 0 42px, rgb(127 181 176 / 0.045) 43px, transparent 44px);
+}
+.hero-ocean::before,
+.hero-ocean::after {
+  border: 1px solid rgb(127 181 176 / 0.14);
+  border-radius: 999px;
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+}
+.hero-ocean::before { height: 34rem; right: -15rem; top: -20rem; width: 34rem; }
+.hero-ocean::after  { height: 22rem; right: -9rem; top: -14rem; width: 22rem; }
+
+.mapa-marco {
+  border: 1px solid rgb(127 181 176 / 0.35);
+  padding: 4px;
+  position: relative;
+}
+.mapa-marco::before {
+  background: var(--color-kelp);
+  content: '';
+  height: 8px;
+  left: -1px;
+  position: absolute;
+  top: -1px;
+  width: 42px;
+  z-index: 2;
+}
+.mapa-marco > * { position: relative; z-index: 1; }
+
+.metric-grid > div {
+  border-left: 1px solid rgb(127 181 176 / 0.18);
+  padding-left: 1rem;
+}
+.metric-grid > div:first-child { border-left: 0; padding-left: 0; }
+
+@media (max-width: 640px) {
+  .metric-grid > div:nth-child(odd) { border-left: 0; padding-left: 0; }
 }
 
 /* La línea de sonda: regla vertical que marca la profundidad de cada

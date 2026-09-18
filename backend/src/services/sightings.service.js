@@ -4,15 +4,15 @@ import { flujoDeAlta, flujoDeAcreditacion } from './automations.service.js';
 
 /**
  * Tabla de premios. Vive en un solo lugar para que la app, el libro mayor
- * y los tests no se desincronicen. Reportar no paga: lo que paga es que el
- * reporte quede verificado.
+ * y los tests no se desincronicen. Un reporte válido suma y la verificación
+ * agrega un segundo premio por la calidad del dato.
  */
 export const PREMIOS = {
-  reporte_basico:   0,
-  foto_verificada: 15,
-  racha_semanal:   33,  // bonos al 65%: 50 → 32,5, redondeado a entero
+  reporte_basico:   15,
+  foto_verificada: 25,
+  racha_semanal:   50,
   voto_comunidad:  10,
-  zona_nueva:      65,  // bonos al 65%: 100 → 65
+  zona_nueva:      100,
 };
 
 /** Por debajo de esta confianza, el reporte va a votación comunitaria. */

@@ -30,9 +30,7 @@ export default function Tokens() {
   const premios = [
     {
       icono: Send, titulo: 'Enviar un reporte', monto: p.reporte_basico,
-      detalle: p.reporte_basico > 0
-        ? 'Se cobra apenas lo enviás.'
-        : 'Enviar no paga por sí solo: lo que vale es el dato confirmado.',
+      detalle: 'Se cobra cuando la ubicación y el tipo quedan confirmados.',
     },
     {
       icono: CircleCheck, titulo: 'Reporte verificado', monto: p.foto_verificada,

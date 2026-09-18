@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { Activity, ArrowRight } from 'lucide-react';
 import { useFetch } from '../../hooks/useFetch.js';
 import MapaZona, { LeyendaMapa } from '../../components/mapa/MapaZona.jsx';
-import { Boton, Panel, Barra } from '../../components/ui/index.jsx';
+import { Boton, Barra } from '../../components/ui/index.jsx';
 import { numero, dolares, colorSalud } from '../../utils/format.js';
 
 /**
@@ -52,9 +52,9 @@ export default function Portada() {
   return (
     <>
       {/* ---------------- HERO: el mapa es el titular ---------------- */}
-      <section className="border-b border-columna bg-abismo px-5 pb-12 pt-6 text-carta lg:px-10">
-        <div className="mx-auto max-w-5xl">
-          <p className="text-sm text-sonda">Golfo Nuevo, Chubut · en vivo</p>
+      <section className="hero-ocean border-b border-columna bg-abismo px-5 pb-12 pt-7 text-carta lg:px-10">
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <p className="flex items-center gap-2 text-sm text-sonda"><Activity size={14} className="text-alga" /> Golfo Nuevo, Chubut · datos de demostración</p>
           <h1 className="mt-3 max-w-2xl font-display text-4xl leading-[1.08] font-600 sm:text-5xl">
             El 90% del bosque de cachiyuyo del Atlántico Sur desapareció desde 1990.
           </h1>
@@ -62,13 +62,18 @@ export default function Portada() {
             Este mapa muestra lo que queda, reportado por la gente que se mete al agua.
           </p>
 
-          <div className="mt-8">
-            <MapaZona zona={golfo} avistamientos={avist?.avistamientos ?? []} alto={400} />
-            <LeyendaMapa className="mt-3 text-sonda/80" />
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link to="/funciones"><Boton variante="kelp">Probar la demo <ArrowRight size={15} /></Boton></Link>
+            <Link to="/ecosistema"><Boton variante="lineaClara">Explorar el ecosistema</Boton></Link>
           </div>
 
+          <div className="mapa-marco mt-8">
+            <MapaZona zona={golfo} avistamientos={avist?.avistamientos ?? []} alto={400} />
+          </div>
+          <LeyendaMapa className="mt-3 text-sonda/80" />
+
           {/* Las cuatro sondas del sistema */}
-          <dl className="mt-10 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-columna pt-8 lg:grid-cols-4">
+          <dl className="metric-grid mt-10 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-columna pt-8 lg:grid-cols-4">
             {[
               { v: numero(indicadores?.reportes_verificados), r: 'reportes verificados' },
               { v: numero(indicadores?.hectareas_en_restauracion, 1), u: 'ha', r: 'en restauración' },

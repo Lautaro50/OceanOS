@@ -7,7 +7,7 @@ import { Loader2 } from 'lucide-react';
 
 export function Panel({ children, className = '', oscuro = false }) {
   return (
-    <div className={`rounded-carta border ${oscuro
+    <div className={`rounded-carta border transition-[transform,border-color,background-color] duration-200 ${oscuro
       ? 'border-columna bg-hondo text-carta'
       : 'border-trazo bg-papel'} ${className}`}>
       {children}
@@ -42,12 +42,12 @@ export function Sonda({ valor, unidad, rotulo, color, className = '' }) {
 }
 
 export function Boton({ children, variante = 'principal', className = '', cargando, ...props }) {
-  const base = 'inline-flex items-center justify-center gap-2 rounded-carta px-4 py-2.5 text-sm font-500 transition-colors disabled:cursor-not-allowed disabled:opacity-50';
+  const base = 'inline-flex items-center justify-center gap-2 rounded-carta px-4 py-2.5 text-sm font-500 transition-[transform,background-color,border-color,color,box-shadow] duration-200 hover:-translate-y-px active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0';
   const variantes = {
     // Sobre agua el primario se invierte: relleno claro, tinta profunda.
     // Con bg-abismo desaparecía contra el fondo de la página.
     principal: 'bg-carta text-abismo hover:bg-sonda',
-    kelp:      'bg-kelp text-abismo hover:bg-kelp-alto',
+    kelp:      'bg-kelp text-abismo hover:bg-kelp-alto hover:shadow-[0_8px_24px_rgb(200_135_47_/_0.28)]',
     linea:     'border border-trazo bg-transparent hover:bg-columna/25',
     lineaClara:'border border-columna text-carta hover:bg-columna/40',
     texto:     'px-1 underline underline-offset-4 hover:text-kelp',

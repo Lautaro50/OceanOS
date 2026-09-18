@@ -106,9 +106,9 @@ dato, quien lo produce pero desconfía, y quien lo paga.
 **Creadores de beneficios**
 
 1. **Tokens OKN canjeables ya**: café en el muelle por 150, inmersión guiada por 1.200, con operadores reales de Madryn y Valdés
-2. **Se paga el dato bueno, no el volumen**: +15 OKN cuando el reporte queda verificado, 0 por cargarlo sin más
-3. **Bonos que empujan a donde no hay nadie**: +65 OKN por el primer reporte de una zona sin actividad en 30 días
-4. **Constancia premiada**: +33 OKN por siete días seguidos reportando
+2. **Un primer reconocimiento inmediato**: +15 OKN cuando ubicación y tipo quedan confirmados; una verificación posterior agrega +25 OKN
+3. **Bonos que empujan a donde no hay nadie**: +100 OKN por el primer reporte de una zona sin actividad en 30 días
+4. **Constancia premiada**: +50 OKN por siete días seguidos reportando
 5. **La reputación pesa**: el voto de quien acumula reportes verificados vale más que el de quien recién llega
 
 ---

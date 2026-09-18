@@ -18,7 +18,7 @@ const RECORRIDO = [
   { titulo: 'Mirá el mapa en vivo',       detalle: 'Tocá cualquier punto para ver qué se vio, a qué profundidad y quién lo reportó.', a: '/app' },
   { titulo: 'Cargá un avistamiento',      a: '/app/reportar',
     // El monto sale de las reglas del servidor, no se escribe a mano.
-    detalle: (r) => `Elegí Bahía Camarones y tocá el mapa: nadie reportó ahí este mes, así que paga ${r ? `+${r.premios.zona_nueva} OKN` : 'el bono de zona nueva'} aunque todavía no esté verificado.` },
+    detalle: (r) => `Elegí Bahía Camarones y tocá el mapa: nadie reportó ahí este mes, así que al básico se le suma ${r ? `el bono de +${r.premios.zona_nueva} OKN` : 'el bono de zona nueva'} aunque todavía no esté verificado.` },
   { titulo: 'Resolvé una votación',       detalle: 'El reporte del gatuzo tiene dos votos. El tuyo es el tercero y lo resuelve.', a: '/app/verificar' },
   { titulo: 'Canjeá tokens',              detalle: 'Con lo que juntaste alcanza para el café del muelle. El código aparece al instante.', a: '/app/billetera' },
   { titulo: 'Entrá como organización',    detalle: 'Cambiá entre la ONG, la pesquera y el área protegida desde la barra lateral.', a: '/panel' },
@@ -77,8 +77,8 @@ export default function Funciones() {
   return (
     <>
       {/* ---------------- Encabezado ---------------- */}
-      <section className="border-b border-columna px-5 pb-12 pt-6 lg:px-10">
-        <div className="mx-auto max-w-5xl">
+      <section className="hero-ocean border-b border-columna px-5 pb-12 pt-7 lg:px-10">
+        <div className="relative z-10 mx-auto max-w-5xl">
           <p className="text-sm text-sonda">Versión de demostración · gratis y sin cuenta</p>
           <h1 className="mt-3 max-w-2xl font-display text-4xl leading-[1.08] font-600 text-carta sm:text-5xl">
             Todo lo que hace OceanOS
@@ -108,7 +108,7 @@ export default function Funciones() {
             {RECORRIDO.map((paso, i) => (
               <li key={paso.titulo}>
                 <Link to={paso.a} className="group block h-full">
-                  <Panel className="flex h-full gap-4 p-4 transition-colors group-hover:border-kelp">
+                  <Panel className="flex h-full gap-4 p-4 group-hover:-translate-y-0.5 group-hover:border-kelp">
                     <span className="cifra grid h-8 w-8 shrink-0 place-items-center rounded-full border border-kelp font-display text-sm font-600 text-kelp">
                       {i + 1}
                     </span>
@@ -151,7 +151,7 @@ export default function Funciones() {
                   <div className="mt-5 grid gap-3 sm:grid-cols-2">
                     {capa.funciones.map(({ icono: Icono, titulo, texto, a }) => (
                       <Link key={titulo} to={a} className="group block">
-                        <div className="flex h-full gap-3 rounded-carta border border-trazo bg-abismo p-4 transition-colors group-hover:border-kelp">
+                        <div className="flex h-full gap-3 rounded-carta border border-trazo bg-abismo p-4 transition-[transform,border-color] duration-200 group-hover:-translate-y-0.5 group-hover:border-kelp">
                           <Icono size={18} className="mt-0.5 shrink-0 text-sonda group-hover:text-kelp" />
                           <div className="min-w-0">
                             <p className="font-500 text-carta">{titulo}</p>

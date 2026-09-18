@@ -11,7 +11,7 @@ const enlaces = [
 // clara. Y ya no hay login: el botón principal lleva a todas las funciones.
 export default function NavPublica() {
   return (
-    <header className="relative z-20 flex items-center justify-between gap-6 px-5 py-4 text-carta lg:px-10">
+    <header className="sticky top-0 z-30 flex items-center justify-between gap-6 border-b border-columna/45 bg-abismo/80 px-5 py-3.5 text-carta backdrop-blur-md lg:px-10">
       <Link to="/" aria-label="OceanOS, inicio">
         <Marca />
       </Link>

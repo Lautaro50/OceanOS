@@ -148,7 +148,7 @@ Contraseña de todas: **`oceano1234`**
 | Correo | Rol | Qué ves |
 |---|---|---|
 | `demo@oceanos.ar` | Ciudadano | Cuenta del proyecto: sin reportes y con 200 OKN de bienvenida |
-| `buzo@oceanos.ar` | Ciudadano | 378 OKN, 23 reportes verificados, racha activa |
+| `buzo@oceanos.ar` | Ciudadano | 970 OKN, 23 reportes verificados, racha activa |
 | `leandro@oceanos.ar` | Ciudadano | 8 de 8 reportes verificados: tiburones, lobos marinos y una red abandonada |
 | `otar@oceanos.ar` | Ciudadano | Reputación alta, puede resolver votaciones |
 | `jose@oceanos.ar` | Organización | APN Valdés, reporta las ballenas del área protegida |
@@ -168,9 +168,9 @@ abriendo los sensores de Pesquera Atlántico Sur (plan Starter), vuelve a recibi
 ```
 oceanos/
 ├── docs/
-│   ├── ECONOMIA-DE-TOKENS.md   Por qué los premios no son los de los PDF
+│   ├── ECONOMIA-DE-TOKENS.md   La tabla de premios y de dónde la lee la interfaz
 │   ├── PROPUESTA-DE-VALOR.md   Personas, mapas de empatía y los dos lienzos
-│   └── DOCUMENTOS-A-ACTUALIZAR.md  Diferencias entre los PDF y lo construido
+│   └── DOCUMENTOS-A-ACTUALIZAR.md  Coherencia entre los documentos y la plataforma
 ├── vercel.json                     Build y rewrite de SPA para el plan gratuito
 ├── database/
 │   ├── migrations/001_init.sql     Esquema completo con vistas calculadas
@@ -244,11 +244,9 @@ registro tampoco— y `/panel/automatizaciones` lo muestra con el diagrama y las
 últimas corridas. n8n de verdad no corre en ningún lado: lo que existe es el modelo
 de datos que lo sostiene.
 
-**Los premios en tokens no son los de los documentos.** La tabla de
-`OceanOS_Plan_Startup-MVP.pdf` dice 15/25/50/10/100; la plataforma aplica
-0/15/33/10/65. El cambio es deliberado y está justificado en
-[docs/ECONOMIA-DE-TOKENS.md](docs/ECONOMIA-DE-TOKENS.md), junto con la lista de
-documentos que hay que actualizar.
+**Los premios en tokens siguen el documento fundacional.** La plataforma y los
+materiales del MVP aplican 15/25/50/10/100: reporte básico, foto verificada,
+racha semanal, voto comunitario y primera zona nueva, respectivamente.
 
 ---
 

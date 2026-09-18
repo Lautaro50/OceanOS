@@ -148,7 +148,7 @@ export default function Billetera() {
         ) : (
           <Panel className="mt-3">
             <Vacio titulo="Todavía no hay movimientos"
-                   detalle={reglas && `Cada reporte tuyo que quede verificado suma ${reglas.premios.foto_verificada} OKN.`} />
+                   detalle={reglas && `Un reporte válido suma ${reglas.premios.reporte_basico} OKN; si queda verificado, agrega ${reglas.premios.foto_verificada} OKN.`} />
           </Panel>
         )}
       </section>

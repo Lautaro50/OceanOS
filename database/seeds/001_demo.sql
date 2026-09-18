@@ -246,17 +246,20 @@ INSERT INTO sighting_votes (sighting_id, user_id, agrees, species_id, weight) VA
 
 -- ---------- LIBRO MAYOR DE TOKENS -----------------------------------
 -- Se deriva de los avistamientos ya cargados, con la tabla de premios de
--- sightings.service.js: reportar no paga (y token_ledger no admite
--- movimientos de 0), y cada reporte verificado paga 15, lo haya verificado
--- el clasificador o la comunidad.
+-- sightings.service.js: un reporte válido paga 15 y, si queda verificado,
+-- suma otros 25 OKN por la calidad del dato.
 INSERT INTO token_ledger (user_id, amount, reason, sighting_id, created_at)
-SELECT user_id, 15, 'foto_verificada', id, COALESCE(resolved_at, created_at + interval '4 hours')
+SELECT user_id, 15, 'reporte_basico', id, created_at
+FROM sightings;
+
+INSERT INTO token_ledger (user_id, amount, reason, sighting_id, created_at)
+SELECT user_id, 25, 'foto_verificada', id, COALESCE(resolved_at, created_at + interval '4 hours')
 FROM sightings WHERE status = 'verificado';
 
 INSERT INTO token_ledger (user_id, amount, reason, detail, created_at) VALUES
- ('33333333-0000-0000-0000-000000000002', 33,'racha_semanal','Racha de 7 días', now() - interval '5 days'),
- ('33333333-0000-0000-0000-000000000005', 33,'racha_semanal','Racha de 7 días', now() - interval '9 days'),
- ('33333333-0000-0000-0000-000000000005', 65,'zona_nueva','Primer reporte en Golfo San José', now() - interval '30 days'),
+ ('33333333-0000-0000-0000-000000000002', 50,'racha_semanal','Racha de 7 días', now() - interval '5 days'),
+ ('33333333-0000-0000-0000-000000000005', 50,'racha_semanal','Racha de 7 días', now() - interval '9 days'),
+ ('33333333-0000-0000-0000-000000000005',100,'zona_nueva','Primer reporte en Golfo San José', now() - interval '30 days'),
  ('33333333-0000-0000-0000-000000000001', 10,'voto_comunidad','Voto en reporte de baja confianza', now() - interval '1 day'),
  ('33333333-0000-0000-0000-000000000003', 10,'voto_comunidad','Voto en reporte de baja confianza', now() - interval '6 hours'),
  ('33333333-0000-0000-0000-000000000009',200,'ajuste','Bienvenida a la cuenta de demostración', now() - interval '2 hours');
