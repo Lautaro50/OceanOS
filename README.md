@@ -72,16 +72,20 @@ El sitio de la demo es una SPA estática: la API corre en el navegador, así que
 necesita base de datos, variables de entorno ni plan pago. Entra entero en el plan
 gratuito.
 
-`vercel.json`, en la raíz, ya deja resuelto qué construir y el rewrite de SPA (sin
-ese rewrite, recargar una dirección como `/app/tokens` devuelve 404 porque no hay
-un archivo con ese nombre).
+El repositorio tiene dos paquetes, `frontend` y `backend`, así que Vercel lo
+detecta como multi-servicio y pide una configuración que no corresponde: el
+backend necesita una base de datos y no entra en el plan gratuito. La solución es
+apuntar el proyecto a la carpeta del frontend y listo.
+
+`frontend/vercel.json` trae el rewrite de SPA, sin el cual recargar una dirección
+como `/app/tokens` devuelve 404 porque no existe un archivo con ese nombre.
 
 Desde el sitio de Vercel:
 
 1. Subir el repositorio a GitHub.
 2. En **vercel.com → Add New → Project**, importar el repositorio.
-3. No hay que tocar ninguna configuración: `vercel.json` ya define el build
-   (`npm --prefix frontend run build`) y la carpeta de salida (`frontend/dist`).
+3. En **Directorio Raíz**, tocar *Editar* y elegir **`frontend`**. Vercel detecta
+   Vite solo y completa el build (`npm run build`) y la salida (`dist`).
 4. **Deploy**. Queda en `https://<nombre>.vercel.app` y se actualiza solo con cada
    push.
 
@@ -171,7 +175,6 @@ oceanos/
 │   ├── ECONOMIA-DE-TOKENS.md   La tabla de premios y de dónde la lee la interfaz
 │   ├── PROPUESTA-DE-VALOR.md   Personas, mapas de empatía y los dos lienzos
 │   └── DOCUMENTOS-A-ACTUALIZAR.md  Coherencia entre los documentos y la plataforma
-├── vercel.json                     Build y rewrite de SPA para el plan gratuito
 ├── database/
 │   ├── migrations/001_init.sql     Esquema completo con vistas calculadas
 │   └── seeds/001_demo.sql          Zonas y especies reales de Chubut
