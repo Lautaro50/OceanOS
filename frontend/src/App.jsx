@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { DemoProvider, useDemo } from './contexts/DemoContext.jsx';
 
 import PublicoLayout from './layouts/PublicoLayout.jsx';
@@ -21,6 +21,13 @@ import Tokens    from './pages/app/Tokens.jsx';
 
 
 import { Boton, Cargando } from './components/ui/index.jsx';
+
+// Abierto con doble clic desde el disco no hay servidor que responda a
+// /app/tokens, asi que la build de archivo unico rutea por el hash. En la
+// version publicada sigue siendo BrowserRouter y las direcciones quedan
+// limpias.
+const EsArchivoUnico = import.meta.env.VITE_ARCHIVO_UNICO === '1';
+const Router = EsArchivoUnico ? HashRouter : BrowserRouter;
 
 // Carga diferida: recharts pesa y solo hace falta en el detalle de zona y
 // en el panel. La app ciudadana no lo baja nunca.
@@ -93,12 +100,12 @@ function Rutas() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <DemoProvider>
         <Suspense fallback={<div className="grid min-h-dvh place-items-center"><Cargando /></div>}>
           <Rutas />
         </Suspense>
       </DemoProvider>
-    </BrowserRouter>
+    </Router>
   );
 }
