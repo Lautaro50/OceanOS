@@ -4,8 +4,8 @@ Plataforma de restauración de ecosistemas marinos del Atlántico Sur.
 Bosques de cachiyuyo y poblaciones de tiburones en la Patagonia, medidos por
 ciencia ciudadana y convertidos en activos verificables.
 
-**Los Sin Chamba** — Lautaro Martinez, Leandro Orozco, Gabriel Maculus,
-Jose Rodriguez, Otar.
+**Si funciona, no lo toques** — Lautaro Martinez, Leandro Orozco, Gabriel Maculus,
+Jose Rodriguez.
 
 ---
 
