@@ -6,6 +6,7 @@ import { useReglas } from '../../hooks/useReglas.js';
 import { useDemo } from '../../contexts/DemoContext.jsx';
 import { api } from '../../services/api.js';
 import { etiquetaDesdeFoto, etiquetarFoto } from '../../services/ia.js';
+import Deslizable from '../../components/app/Deslizable.jsx';
 import { Panel, Boton, Cargando, CajaError, Etiqueta, Vacio } from '../../components/ui/index.jsx';
 import { numero, hace, TIPOS } from '../../utils/format.js';
 
@@ -54,6 +55,8 @@ export default function Verificar() {
         <Link to="/app/ia" className="text-sonda underline underline-offset-4 hover:text-kelp">Cómo aprende la IA</Link>
       </p>
 
+      <p className="mt-2 text-xs text-sonda/80">Deslizá una tarjeta hacia la derecha para coincidir, o hacia la izquierda para descartarla.</p>
+
       {error && <div className="mt-4"><CajaError error={error} onReintentar={recargar} /></div>}
       {falla && <div className="mt-4"><CajaError error={falla} /></div>}
 
@@ -66,8 +69,8 @@ export default function Verificar() {
         <div className="mt-6 space-y-4">
           {cola.map((a) => {
             const resuelto = resueltos[a.id];
-            return (
-              <Panel key={a.id} className="p-5">
+            const tarjeta = (
+              <Panel className="p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <Etiqueta color={TIPOS[a.kind]?.color}>{TIPOS[a.kind]?.etiqueta}</Etiqueta>
@@ -132,6 +135,9 @@ export default function Verificar() {
                   </div>
                 )}
               </Panel>
+            );
+            return resuelto ? <div key={a.id}>{tarjeta}</div> : (
+              <Deslizable key={a.id} deshabilitado={votando === a.id} onDecidir={(coincide) => votar(a.id, coincide)}>{tarjeta}</Deslizable>
             );
           })}
         </div>

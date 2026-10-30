@@ -1,5 +1,6 @@
 import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Map, PlusCircle, Wallet, CheckSquare, User, LayoutGrid, RotateCcw, ArrowLeftRight } from 'lucide-react';
+import { Map, PlusCircle, Wallet, CheckSquare, User, LayoutGrid, RotateCcw, ArrowLeftRight, Camera, Coins } from 'lucide-react';
+import BotonCamara from '../app/BotonCamara.jsx';
 import { Marca } from '../marca/Logo.jsx';
 import { Selector } from '../ui/index.jsx';
 import { useDemo } from '../../contexts/DemoContext.jsx';
@@ -13,6 +14,20 @@ const ENLACES_APP = [
   { to: '/app/billetera',  icono: Wallet,      label: 'Billetera' },
   { to: '/app/perfil',     icono: User,        label: 'Perfil' },
 ];
+
+// Barra del teléfono (app ciudadana): cuatro secciones y la cámara en el centro.
+const ITEMS_MOVIL = [
+  { to: '/app/menu',      icono: LayoutGrid,  label: 'Menú',     exacto: true },
+  { to: '/app',           icono: Map,         label: 'Mapa',     exacto: true },
+  { to: '/app/verificar', icono: CheckSquare, label: 'Verificar' },
+  { to: '/app/perfil',    icono: User,        label: 'Perfil' },
+];
+const itemMovil = ({ to, icono: Icono, label, exacto }) => (
+  <NavLink key={to} to={to} end={exacto}
+    className={({ isActive }) => `nav-item flex flex-1 flex-col items-center gap-1 py-2.5 text-[10.5px] ${isActive ? 'activo text-kelp-alto' : 'text-sonda'}`}>
+    <Icono size={21} /> {label}
+  </NavLink>
+);
 
 /**
  * Barra lateral en escritorio; en teléfono, una barra arriba para volver
@@ -93,6 +108,7 @@ export default function BarraApp({ enlaces = ENLACES_APP, titulo = 'App ciudadan
       </aside>
 
       {/* ---------- Teléfono: arriba ---------- */}
+      {panel ? (
       <header className="sticky top-0 z-30 border-b border-columna header-seguro bg-abismo/95 px-4 pb-2.5 backdrop-blur lg:hidden">
         <div className="flex items-center justify-between gap-3">
           <Link to="/" aria-label="OceanOS, inicio"><Marca tamaño={26} animado /></Link>
@@ -103,8 +119,22 @@ export default function BarraApp({ enlaces = ENLACES_APP, titulo = 'App ciudadan
         </div>
         {panel && <div className="mt-2">{selectorOrg}</div>}
       </header>
+      ) : (
+      <header className="sticky top-0 z-30 header-seguro bg-abismo/55 px-4 pb-2.5 backdrop-blur-xl lg:hidden">
+        <div className="flex items-center justify-between gap-3">
+          <Link to="/app/menu" aria-label="OceanOS, menú"><Marca tamaño={26} animado /></Link>
+          <div className="flex items-center gap-2">
+            <Link to="/app/billetera" aria-label="Billetera" className="vidrio inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs text-carta">
+              <Coins size={13} className="text-kelp-alto" /> <span className="cifra font-600 text-kelp-alto">{numero(user?.balance_okn)}</span> OKN
+            </Link>
+            <Link to="/app/perfil" aria-label="Perfil" className="grid h-8 w-8 place-items-center rounded-full bg-kelp text-sm font-600 text-abismo">{user?.full_name?.trim()?.[0]?.toUpperCase() ?? 'O'}</Link>
+          </div>
+        </div>
+      </header>
+      )}
 
       {/* ---------- Teléfono: abajo ---------- */}
+      {panel ? (
       <nav className="barra-inferior fixed inset-x-0 bottom-0 z-30 flex border-t border-columna lg:hidden">
         <span className="barra-indicador" aria-hidden="true"
               style={{ width: `${100 / enlaces.length}%`, transform: `translateX(${Math.max(activo, 0) * 100}%)`, opacity: activo < 0 ? 0 : 1 }} />
@@ -117,6 +147,19 @@ export default function BarraApp({ enlaces = ENLACES_APP, titulo = 'App ciudadan
           </NavLink>
         ))}
       </nav>
+      ) : (
+      <nav aria-label="Secciones" className="nav-flotante fixed inset-x-3 z-30 lg:hidden">
+        <div className="nav-pildora vidrio relative flex items-center rounded-[1.7rem] px-1.5">
+          {ITEMS_MOVIL.slice(0, 2).map(itemMovil)}
+          <span className="w-[4.5rem] shrink-0" aria-hidden="true" />
+          {ITEMS_MOVIL.slice(2).map(itemMovil)}
+          <BotonCamara etiqueta="Abrir la cámara para reportar"
+            className={`fab-camara absolute -top-7 left-1/2 -translate-x-1/2 ${pathname.startsWith('/app/reportar') ? 'fab-activo' : ''}`}>
+            <Camera size={27} strokeWidth={2.2} />
+          </BotonCamara>
+        </div>
+      </nav>
+      )}
     </>
   );
 }

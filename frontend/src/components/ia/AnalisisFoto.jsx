@@ -1,19 +1,33 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Camera, Check, Info, MapPin, Sparkles, TriangleAlert, X } from 'lucide-react';
+import { Camera, Check, Image as Galeria, Info, MapPin, Sparkles, TriangleAlert, X } from 'lucide-react';
 import { analizarFoto, iaConfigurada } from '../../services/ia.js';
+import { tomarFotoPendiente } from '../../services/fotoPendiente.js';
 import { Boton, Selector } from '../ui/index.jsx';
 
 const pct = (x) => `${Math.round(x * 100)}%`;
+
+/** Versión chica de la foto (~40 KB) para adjuntarla al reporte cuando todavía no hay servicio de IA. */
+async function miniatura(archivo) {
+  try {
+    const bmp = await createImageBitmap(archivo, { imageOrientation: 'from-image' });
+    const k = Math.min(1, 560 / Math.max(bmp.width, bmp.height));
+    const l = document.createElement('canvas'); l.width = Math.round(bmp.width * k); l.height = Math.round(bmp.height * k);
+    l.getContext('2d').drawImage(bmp, 0, 0, l.width, l.height);
+    return l.toDataURL('image/jpeg', 0.65);
+  } catch { return null; }
+}
 
 /**
  * Foto -> la IA propone qué es, vos confirmás o corregís. Lo que confirmás es lo que aprende el modelo.
  * Nunca decide sola: la sugerencia es un punto de partida, no un dato verificado.
  */
 export default function AnalisisFoto({ taxonomia, onChange, onUsarUbicacion }) {
-  const entrada = useRef(null);
+  const camara = useRef(null);
+  const galeria = useRef(null);
+  const ia = iaConfigurada();
   const [archivoUrl, setArchivoUrl] = useState(null);
-  const [fase, setFase] = useState('vacio');          // vacio | analizando | listo | error
+  const [fase, setFase] = useState('vacio');          // vacio | analizando | listo | local | error
   const [res, setRes] = useState(null);
   const [error, setError] = useState(null);
   const [elegida, setElegida] = useState(null);       // id de la especie confirmada ('ninguna' incluido)
@@ -31,24 +45,25 @@ export default function AnalisisFoto({ taxonomia, onChange, onUsarUbicacion }) {
     });
   };
 
-  const elegirArchivo = async (e) => {
-    const archivo = e.target.files?.[0]; if (!archivo) return;
-    setArchivoUrl(URL.createObjectURL(archivo)); setFase('analizando'); setError(null); setRes(null); setElegida(null); setCorrigiendo(false); onChange?.(null);
+  const procesar = async (archivo) => {
+    setArchivoUrl(URL.createObjectURL(archivo)); setError(null); setRes(null); setElegida(null); setCorrigiendo(false); onChange?.(null);
+    if (!ia) {                                   // sin servicio de IA: la foto se adjunta tal cual, sin analizar
+      setFase('local');
+      const m = await miniatura(archivo); onChange?.(m ? { local: true, imagen: m } : null);
+      return;
+    }
+    setFase('analizando');
     try {
       const r = await analizarFoto(archivo); setRes(r); setFase('listo'); emitir(r, null);
     } catch (err) { setError(err); setFase('error'); }
-    e.target.value = '';
   };
+  const elegirArchivo = (e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) procesar(f); };
+
+  // Si la foto vino del botón de cámara (menú o barra inferior), se procesa sola al llegar.
+  useEffect(() => { const f = tomarFotoPendiente(); if (f) procesar(f); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const quitar = () => { setArchivoUrl(null); setFase('vacio'); setRes(null); setElegida(null); setCorrigiendo(false); onChange?.(null); };
   const elegir = (id) => { setElegida(id); setCorrigiendo(false); emitir(res, id); };
-
-  if (!iaConfigurada()) {
-    return (
-      <p className="flex items-start gap-2 rounded-carta border border-trazo px-3.5 py-3 text-sm text-tinta/80">
-        <Info size={16} className="mt-0.5 shrink-0" /> El análisis de fotos con IA todavía no está conectado en esta versión. Podés reportar igual.
-      </p>
-    );
-  }
 
   const p = res?.prediccion; const nombreDe = (id) => id === 'ninguna' ? 'Ninguna de estas' : (taxonomia ?? []).find((t) => t.id === id)?.nombre ?? id;
   const confirmada = elegida && elegida !== 'ninguna';
@@ -56,17 +71,25 @@ export default function AnalisisFoto({ taxonomia, onChange, onUsarUbicacion }) {
   return (
     <div>
       <span className="mb-2 flex items-center gap-1.5 text-sm font-500">
-        <Sparkles size={14} className="text-kelp" /> Foto <span className="text-xs font-400 text-tinta/60">· opcional, la IA te ayuda a identificar</span>
+        <Sparkles size={14} className="text-kelp" /> Foto <span className="text-xs font-400 text-tinta/60">· opcional{ia ? ', la IA te ayuda a identificar' : ''}</span>
       </span>
-      <input ref={entrada} type="file" accept="image/*" onChange={elegirArchivo} className="hidden" aria-label="Subir una foto" />
+      <input ref={camara} type="file" accept="image/*" capture="environment" onChange={elegirArchivo} className="hidden" aria-label="Sacar una foto" />
+      <input ref={galeria} type="file" accept="image/*" onChange={elegirArchivo} className="hidden" aria-label="Elegir una foto de la galería" />
 
       {fase === 'vacio' && (
-        <button type="button" onClick={() => entrada.current?.click()}
-          className="group flex w-full flex-col items-center gap-2 rounded-carta border border-dashed border-sonda/60 px-4 py-8 text-sm text-tinta transition-colors hover:border-kelp hover:bg-papel">
-          <span className="grid h-11 w-11 place-items-center rounded-full bg-kelp/15 text-kelp transition-transform duration-500 group-hover:scale-110"><Camera size={20} /></span>
-          <span className="font-500">Sacá o subí una foto</span>
-          <span className="max-w-xs text-center text-xs text-tinta/60">La foto se guarda para ayudar a que el modelo aprenda. No incluye tu ubicación.</span>
-        </button>
+        <div className="grid grid-cols-2 gap-3">
+          <button type="button" onClick={() => camara.current?.click()}
+            className="group flex flex-col items-center gap-2 rounded-carta border border-kelp/50 bg-kelp/8 px-4 py-6 text-sm transition-all duration-300 hover:bg-kelp/15 active:scale-[.97]">
+            <span className="grid h-12 w-12 place-items-center rounded-full bg-kelp text-abismo transition-transform duration-500 group-hover:scale-110"><Camera size={22} /></span>
+            <span className="font-500">Sacar foto</span>
+          </button>
+          <button type="button" onClick={() => galeria.current?.click()}
+            className="group flex flex-col items-center gap-2 rounded-carta border border-dashed border-sonda/60 px-4 py-6 text-sm transition-all duration-300 hover:border-kelp hover:bg-papel active:scale-[.97]">
+            <span className="grid h-12 w-12 place-items-center rounded-full bg-sonda/15 text-sonda transition-transform duration-500 group-hover:scale-110"><Galeria size={22} /></span>
+            <span className="font-500">Galería</span>
+          </button>
+          <p className="col-span-2 text-center text-xs text-tinta/60">{ia ? 'La foto se guarda para ayudar a que el modelo aprenda. No incluye tu ubicación.' : 'La foto se adjunta a tu reporte.'}</p>
+        </div>
       )}
 
       {fase !== 'vacio' && (
@@ -78,6 +101,10 @@ export default function AnalisisFoto({ taxonomia, onChange, onUsarUbicacion }) {
             <button type="button" onClick={quitar} aria-label="Quitar foto"
               className="absolute top-2 right-2 grid h-8 w-8 place-items-center rounded-full bg-abismo/70 text-carta backdrop-blur transition-colors hover:bg-abismo"><X size={16} /></button>
           </div>
+
+          {fase === 'local' && (
+            <p className="flex items-start gap-2 px-4 py-3 text-sm text-tinta/80"><Info size={16} className="mt-0.5 shrink-0" /> La foto se adjunta a tu reporte. El análisis con IA todavía no está conectado: elegí vos qué viste.</p>
+          )}
 
           {fase === 'error' && (
             <p className="flex items-start gap-2 px-4 py-3 text-sm text-alerta"><TriangleAlert size={16} className="mt-0.5 shrink-0" /> {error?.message}</p>

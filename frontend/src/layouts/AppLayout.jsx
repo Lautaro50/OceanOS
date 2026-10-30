@@ -27,12 +27,13 @@ export default function AppLayout() {
   // En teléfono va en bloque (barra arriba, contenido, barra abajo); desde
   // lg es una fila con la barra lateral.
   return (
-    <div className="min-h-dvh bg-abismo lg:flex">
+    <div className="relative isolate min-h-dvh bg-abismo lg:flex">
+      <div className="app-aurora" aria-hidden="true"><i /><i /><i /></div>
       {splash && <Splash onFin={terminar} />}
       {!splash && bienvenida && <Bienvenida onFin={() => setBienvenida(false)} />}
       <CelebracionLogros activa={!splash && !bienvenida} />
       <BarraApp />
-      <main key={pathname} className="pagina-entra min-w-0 flex-1 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:pb-0"><Outlet /></main>
+      <main key={pathname} className="pagina-entra min-w-0 flex-1 pb-[calc(7.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0"><Outlet /></main>
     </div>
   );
 }

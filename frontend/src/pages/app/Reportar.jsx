@@ -109,7 +109,7 @@ export default function Reportar() {
         // La foto y la especie que la persona confirmó viajan con el reporte. La confianza de la
         // IA solo se envía si el modelo está validado y la persona confirmó justo lo que sugirió:
         // con ese número el sistema verifica solo y paga tokens.
-        photoUrl: foto?.imagen ? `${IA_BASE}${foto.imagen}?clase=${foto.claseId ?? ''}` : undefined,
+        photoUrl: foto?.local ? foto.imagen : foto?.imagen ? `${IA_BASE}${foto.imagen}?clase=${foto.claseId ?? ''}` : undefined,
         aiLabel: foto?.nombre || undefined,
         aiConfidence: foto?.puedeAuto ? foto.confianza : undefined,
       });
