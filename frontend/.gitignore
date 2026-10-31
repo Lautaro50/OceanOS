@@ -1,0 +1,5 @@
+# Claves de firma del APK: NUNCA se suben al repo.
+*.jks
+*.keystore
+*.idsig
+keystore.properties

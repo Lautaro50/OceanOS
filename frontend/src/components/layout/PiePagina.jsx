@@ -2,16 +2,18 @@ import { Link } from 'react-router-dom';
 import { Marca } from '../marca/Logo.jsx';
 
 /**
- * Los cinco de Los Sin Chamba. Van en el pie porque el profesor los busca
- * en el sitio, no solo en la carátula del informe.
+ * El equipo de Los Sin Chamba y su supervisor. Van en el pie porque el profesor
+ * los busca en el sitio, no solo en la carátula del informe.
  */
 const EQUIPO = [
   'Lautaro Martinez',
   'Leandro Orozco',
   'Gabriel Maculus',
   'Jose Rodriguez',
-  'Otar',
 ];
+
+const SUPERVISOR = 'Ingeniero Osvaldo Giordanini';
+const FACULTAD = { nombre: 'UTN Facultad Regional San Rafael', url: 'https://www.frsr.utn.edu.ar/' };
 
 export default function PiePagina() {
   return (
@@ -38,12 +40,17 @@ export default function PiePagina() {
               <li><Link to="/panel" className="hover:text-carta">Panel de organizaciones</Link></li>
             </ul>
           </div>
-          <div>
+          <div className="max-w-[15rem]">
             <p className="mb-2 font-500">Equipo</p>
             <ul className="space-y-1.5 text-sonda">
               {EQUIPO.map((nombre) => <li key={nombre}>{nombre}</li>)}
             </ul>
-            <p className="mt-3 text-xs text-sonda/70">UTN · Tecnicatura en Programación</p>
+            <p className="mt-4 text-xs text-sonda/70">Supervisor</p>
+            <p className="text-sm text-sonda">{SUPERVISOR}</p>
+            <p className="mt-3 text-xs text-sonda/70">
+              <a href={FACULTAD.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 transition-colors hover:text-carta">{FACULTAD.nombre}</a>
+              {' · '}Tecnicatura en Programación
+            </p>
           </div>
           <div>
             <p className="mb-2 font-500">Alianzas</p>

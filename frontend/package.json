@@ -10,7 +10,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "build:unico": "vite build --mode unico && node scripts/embeber-favicon.mjs"
+    "build:unico": "vite build --mode unico && node scripts/embeber-favicon.mjs",
+    "app:sync": "vite build && node scripts/preparar-app.mjs && npx cap sync android"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.3",
