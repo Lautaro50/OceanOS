@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Marca } from '../marca/Logo.jsx';
 
 /**
- * El equipo de Los Sin Chamba y su supervisor. Van en el pie porque el profesor
+ * El equipo de LGL Solutions y su supervisor. Van en el pie porque el profesor
  * los busca en el sitio, no solo en la carátula del informe.
  */
 const EQUIPO = [
@@ -25,7 +25,7 @@ export default function PiePagina() {
             Restauramos ecosistemas y los convertimos en activos verificables.
           </p>
           <p className="mt-4 text-xs text-sonda/70">
-            Los Sin Chamba · Puerto Madryn, Chubut, Argentina
+            LGL Solutions · Puerto Madryn, Chubut, Argentina
           </p>
         </div>
 
